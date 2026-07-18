@@ -1,0 +1,16 @@
+/*-- scss:defaults --*/
+$link-color: #18bc9c;
+$code-color: #555555;
+
+/*-- scss:rules --*/
+code, p code, li code, td code {
+  color: #555555 !important;
+}
+
+:not(pre) > code {
+  color: #555555 !important;
+}
+
+a {
+  color: #18bc9c !important;
+}

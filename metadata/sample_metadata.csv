@@ -1,0 +1,16 @@
+Sample Name,GSM accecion,SRR accession,Renamed to,Technique,Zone,Sort/Reporter,Cell type,Replicate
+RNAseq_Zone1_Ngn1GFPdim_r1,GSM4815274 ,SRR12761392,RNA_Zone1_mOSN_Rep1,RNA-seq,Zone 1,Ngn1-GFP dim (FACS sorted),mOSN,1
+RNAseq_Zone1_Ngn1GFPdim_r2,GSM4815275,SRR12761393,RNA_Zone1_mOSN_Rep2,RNA-seq,Zone 1,Ngn1-GFP dim (FACS sorted),mOSN,2
+RNAseq_Zone1_Ngn1GFPdim_r3,GSM4815276,SRR12761394,RNA_Zone1_mOSN_Rep3,RNA-seq,Zone 1,Ngn1-GFP dim (FACS sorted),mOSN,3
+RNAseq_Zone5_Ngn1GFPdim_r1,GSM4815285,SRR12761403,RNA_Zone5_mOSN_Rep1,RNA-seq,Zone 5,Ngn1-GFP dim (FACS sorted),mOSN,1
+RNAseq_Zone5_Ngn1GFPdim_r2,GSM4815286,SRR12761404,RNA_Zone5_mOSN_Rep2,RNA-seq,Zone 5,Ngn1-GFP dim (FACS sorted),mOSN,2
+RNAseq_Zone5_Ngn1GFPdim_r3,GSM4815287,SRR12761405,RNA_Zone5_mOSN_Rep3,RNA-seq,Zone 5,Ngn1-GFP dim (FACS sorted),mOSN,3
+RNAseq_Zone2_Ngn1GFPdim_r1,GSM4815294,SRR12761412,RNA_Zone2_mOSN_Rep1,RNA-seq,Zone 2,Ngn1-GFP dim (FACS sorted),mOSN,1
+RNAseq_Zone2_Ngn1GFPdim_r2,GSM4815295,SRR12761413,RNA_Zone2_mOSN_Rep2,RNA-seq,Zone 2,Ngn1-GFP dim (FACS sorted),mOSN,2
+nchip_Z1_OMPgfp_H3K9me3_r1,GSM4815328,SRR12761446,ChIP_Zone1_mOSN_Rep1,ChIP-seq,Zone 1,OMP-GFP+ (FACS sorted),mOSN,1
+nchip_Z1_OMPgfp_H3K9me3_r2,GSM4815333,SRR12761451,ChIP_Zone1_mOSN_Rep2,ChIP-seq,Zone 1,OMP-GFP+ (FACS sorted),mOSN,2
+nchip_Z2_OMPgfp_H3K9me3_r1,GSM4815330,SRR12761448,ChIP_Zone2_mOSN_Rep1,ChIP-seq,Zone 2,OMP-GFP+ (FACS sorted),mOSN,1
+nchip_Z2_OMPgfp_H3K9me3_r2,GSM4815334,SRR12761452,ChIP_Zone2_mOSN_Rep2,ChIP-seq,Zone 2,OMP-GFP+ (FACS sorted),mOSN,2
+nchip_Z5_OMPgfp_H3K9me3_r1,GSM4815332,SRR12761450,ChIP_Zone5_mOSN_Rep1,ChIP-seq,Zone 5,OMP-GFP+ (FACS sorted),mOSN,1
+nchip_Z5_OMPgfp_H3K9me3_r2,GSM4815335,SRR12761453,ChIP_Zone5_mOSN_Rep2,ChIP-seq,Zone 5,OMP-GFP+ (FACS sorted),mOSN,2
+nchip_MOE_H3K9me3_r1,GSM4815345,SRR12761463,ChIP_Bulk_mOSN_Rep1,ChIP-seq,Not specified,Bulk,Bulk,1

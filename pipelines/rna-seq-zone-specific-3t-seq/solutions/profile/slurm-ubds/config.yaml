@@ -1,0 +1,11 @@
+cores: 32
+local-cores: 32
+jobs: 4
+restart-times: 2
+printshellcmds: True
+software-deployment-method:
+  - apptainer
+  - conda
+apptainer-args: "--no-home"
+conda-frontend: conda
+latency-wait: 60

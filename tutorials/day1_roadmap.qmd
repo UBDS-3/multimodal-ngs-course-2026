@@ -1,0 +1,452 @@
+---
+title: "Multimodal NGS analysis of gene expression and chromatin state in olfactory epithelium"
+subtitle: "Day 1 — Setting up your environment and downloading the data"
+author: "Lisa Korneeva"
+date: today
+format:
+  html:
+    grid:
+      body-width: 1000px
+    self-contained: true
+    toc: true
+    toc-location: left
+    toc-depth: 3
+    theme:
+      - flatly
+      - custom.scss
+    highlight-style: github
+    code-fold: show
+execute:
+  echo: true
+  eval: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, eval = FALSE)
+```
+
+---
+
+# Overview
+
+Welcome to the course! Today we will:
+
+- Find and explore the dataset from the published paper
+- Set up the **computational environment** on your server
+- Download the raw **RNA-seq data** using **nf-core/fetchngs**
+- Rename the downloaded files to meaningful sample names
+
+By the end of the day you should have (hopefully) all raw data downloaded and renamed.
+
+---
+
+# 1. The Dataset
+
+## 1.1 Paper
+
+We will be working with a published dataset from a study on zone-specific gene expression
+in the mouse main olfactory epithelium (MOE). Go to the following paper and read it,
+focusing on the **Materials and Methods** section, specifically the part describing
+the **RNA-seq** and **ChIP-seq** experiments:
+
+> **Paper:** [https://elifesciences.org/articles/87445#s4](https://elifesciences.org/articles/87445#s4)
+
+**Exercise:** Answer the following questions based on the Methods section:
+
+1. What cell types were isolated and how were they sorted?
+2. What sequencing platform(s) were used?
+3. What read length was used for sequencing?
+4. What library preparation kit was used?
+5. Where is the raw data deposited? What is the GEO accession number?
+
+## 1.2 Data on NCBI GEO
+
+Go to NCBI GEO and search for the dataset using the accession number you found:
+
+> **NCBI GEO:** [https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi)
+
+Browse the samples and identify the RNA-seq and ChIP-seq samples. We will be working with the following 8 samples for RNA-seq and 7 samples for ChIP-seq:
+
+```{r sample-table, eval=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
+library(knitr)
+library(kableExtra)
+
+samples <- data.frame(
+  `Sample Name` = c(
+    "RNAseq_Zone1_Ngn1GFPdim_r1",
+    "RNAseq_Zone1_Ngn1GFPdim_r2",
+    "RNAseq_Zone1_Ngn1GFPdim_r3",
+    "RNAseq_Zone5_Ngn1GFPdim_r1",
+    "RNAseq_Zone5_Ngn1GFPdim_r2",
+    "RNAseq_Zone5_Ngn1GFPdim_r3",
+    "RNAseq_Zone2_Ngn1GFPdim_r1",
+    "RNAseq_Zone2_Ngn1GFPdim_r2",
+    "nchip_Z1_OMPgfp_H3K9me3_r1",
+    "nchip_Z1_OMPgfp_H3K9me3_r2",
+    "nchip_Z2_OMPgfp_H3K9me3_r1",
+    "nchip_Z2_OMPgfp_H3K9me3_r2",
+    "nchip_Z5_OMPgfp_H3K9me3_r1",
+    "nchip_Z5_OMPgfp_H3K9me3_r2",
+    "nchip_MOE_H3K9me3_r1"
+  ),
+  `GSM Accession` = c(
+    "GSM4815274", "GSM4815275", "GSM4815276",
+    "GSM4815285", "GSM4815286", "GSM4815287",
+    "GSM4815294", "GSM4815295", "GSM4815328",
+    "GSM4815333", "GSM4815330", "GSM4815334",
+    "GSM4815332", "GSM4815335", "GSM4815345"
+  ),
+  `SRR Accession` = c(
+    "SRR12761392", "SRR12761393", "SRR12761394",
+    "SRR12761403", "SRR12761404", "SRR12761405",
+    "SRR12761412", "SRR12761413", "SRR12761446",
+    "SRR12761451", "SRR12761448", "SRR12761452",
+    "SRR12761450", "SRR12761453", "SRR12761463"
+  ),
+  `Renamed to` = c(
+    "RNA_Zone1_mOSN_Rep1", "RNA_Zone1_mOSN_Rep2", "RNA_Zone1_mOSN_Rep3", 
+    "RNA_Zone5_mOSN_Rep1", "RNA_Zone5_mOSN_Rep2", "RNA_Zone5_mOSN_Rep3", 
+    "RNA_Zone2_mOSN_Rep1", "RNA_Zone2_mOSN_Rep2", "ChIP_Zone1_mOSN_Rep1", 
+    "ChIP_Zone1_mOSN_Rep2", "ChIP_Zone2_mOSN_Rep1", "ChIP_Zone2_mOSN_Rep2", 
+    "ChIP_Zone5_mOSN_Rep1", "ChIP_Zone5_mOSN_Rep2", "ChIP_Bulk_mOSN_Rep1" 
+  ),
+  Technique = c(rep("RNA-seq", 8), rep("ChIP-seq", 7)), 
+  Zone = c("Zone 1", "Zone 1", "Zone 1", 
+           "Zone 5", "Zone 5", "Zone 5", 
+           "Zone 2", "Zone 2", "Zone 1", 
+           "Zone 1", "Zone 2", "Zone 2", 
+           "Zone 5", "Zone 5", "Bulk"), 
+  `Sort/Reporter` = c(rep("Ngn1-GFP dim (FACS sorted)", 8), rep("OMP-GFP+ (FACS sorted)", 6), "Bulk"),
+  `Cell type` = c(rep("mOSN", 14), rep("Bulk", 1)),
+  Replicate = c(1, 2, 3, 1, 2, 3, 1, 2, 1, 2, 1, 2, 1, 2, 1),
+  check.names = FALSE
+)
+
+kable(samples, align = "l") %>%
+  kable_styling(
+    bootstrap_options = c("striped", "hover", "condensed"),
+    full_width = TRUE,
+    font_size = 11
+  ) %>%
+  scroll_box(width = "100%")
+```
+
+> **Note:** This table is also available as `metadata/sample_metadata.csv` in the
+> course directory.
+
+---
+
+# 2. Connecting to your server
+
+Connect to server via **SSH**. More instructions will follow on the day, because right now when I am writing this script I have no idea yet. 
+
+```{bash}
+ssh username@SERVER_IP
+```
+
+---
+
+# 3. Using screen on a remote server
+
+When running long jobs on a remote server, it is helpful to use `screen`. It keeps your
+session alive even if your connection drops, and lets you run multiple things
+simultaneously in separate windows.
+
+## 3.1 Basic Screen commands
+
+| Command | What it does |
+|---------|-------------|
+| `screen -S name` | Create new named session |
+| `screen -ls` | List all sessions |
+| `Ctrl + A, D` | Detach from current session |
+| `screen -r name` | Reattach to named session |
+| `screen -r` | Reattach (if only one session) |
+| `screen -X -S name quit` | Kill a named session |
+| `exit` | Exit and kill current session |
+
+> **Tip:** Give your screens descriptive names (e.g. `fetchngs`, `rnaseq`,
+> `chipseq`) so you can easily find them. You can have as many screens running
+> simultaneously as you need.
+
+---
+
+# 4. Setting up the environment
+
+## 4.1 Install Conda
+
+We use **Miniforge3** as our conda distribution. It is lightweight, open-source,
+and comes with the `conda-forge` channel set as default.
+
+Check if conda is already installed:
+
+```{bash}
+conda --version
+conda config --set auto_activate_base false # to disable (base) to be activated by default
+```
+
+If not, install Miniforge3:
+
+```{bash}
+# Download the installer
+curl -L https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-x86_64.sh -o Miniforge3.sh
+
+# Run the installer — accept the defaults
+bash Miniforge3.sh
+
+# Reload your shell
+source ~/.bashrc
+
+# Verify installation
+conda --version
+```
+
+## 4.2 Create the Nextflow environment
+
+[Nextflow](https://www.nextflow.io/) is a workflow management system designed for scalable and reproducible scientific pipelines. It is widely used in bioinformatics - most nf-core pipelines, including `fetchngs`, are built on top of it.
+Nextflow handles the complexity of running multi-step pipelines by:
+
+- Automatically managing dependencies between steps
+- Running independent steps in parallel
+- Submitting jobs to computing infrastructure (local, HPC cluster, or cloud)
+- Using containers (Docker, Singularity/Apptainer) to ensure reproducibility — every tool runs in an isolated, version-controlled software environment
+
+> **Question:** How is this different from running a bash script that calls each
+> tool sequentially?
+
+Also Nextflow has a dynamic community called **nf-core** that develops and maintains a curated collection of Nextflow pipelines following best practices. Some of them we will use in this course:
+
+| Pipeline | Purpose |
+|----------|------|
+| [nf-co.re/fetchngs](https://nf-co.re/fetchngs) | Download raw sequencing data from public repositories |
+| [nf-co.re/rnaseq](https://nf-co.re/rnaseq/) | RNA-seq data processing (we won't use it in this course, but it exists, you know) |
+| [nf-co.re/chipseq](https://snakemake.readthedocs.io) | ChIP-seq data processing |
+
+We create a dedicated conda environment for Nextflow and Python, isolating it from other tools:
+
+```{bash}
+# Check if nextflow is already available:
+nextflow -version
+
+# If not, install it:
+conda create -n nextflow-env -c bioconda -c conda-forge nextflow openjdk=17
+
+# Check if Python 3.9 is already available:
+python --version
+
+# If not, install it:
+conda create -n py39 python=3.9 -y # needed for some background processes
+
+```
+
+> **Note:** We explicitly install `openjdk=17` because the `nf-schema` plugin
+> used by nf-core pipelines requires Java 17+. Without this, you may encounter
+> errors about incompatible Java class file versions.
+
+---
+
+# 5. Downloading the RNA-seq and ChIP-seq data
+
+We use [nf-core/fetchngs](https://nf-co.re/fetchngs) to download raw sequencing
+data directly from SRA using accession numbers.
+
+- Read the pipeline documentation
+- Understand the structure of the pipeline and input requirements
+
+## 5.1 Configure the input for `fetchngs`
+
+Navigate to `~/multimodal-ngs-ubds-2026/pipelines/fetchngs`. Here you will find the following things:
+
+- a directory `solutions` that will be our mental support in case we get stuck
+- a file `nextflow.config` where I tried to put together the resources to be used by the pipeline.
+
+Execute the following commands:
+```{bash}
+mkdir output # we will use this directory for the output of fetchngs
+mkdir logs # for nextflow log files
+touch ids.csv # we need to specify our samples with SRR accession numbers in this csv file 
+touch run_fetchngs.sh # we will use this script to run fetchngs
+chmod +x run_fetchngs.sh # make the .sh file executable
+
+```
+
+Add to `ids.csv` the SRR accession numbers from the table above.
+
+```{bash}
+cat > ids.csv << EOF
+SRR12761392 
+SRR12761393
+SRR12761394
+SRR12761403
+SRR12761404
+SRR12761405
+SRR12761412
+SRR12761413
+SRR12761446 
+SRR12761451
+SRR12761448
+SRR12761452
+SRR12761450
+SRR12761453
+SRR12761463
+EOF
+```
+
+> **Note:** You can use [nano](https://www.nano-editor.org/), [vim](https://www.vim.org/) or [neovim](https://neovim.io/) for editing the text files in console. 
+> 
+
+Prepare the previously created `run_fetchngs.sh` file by adding there a command for running `fetchngs` pipeline:
+
+```{bash}
+#!/bin/bash
+
+export NXF_VER=24.10.6
+
+nextflow run nf-core/fetchngs \
+    --input ids.csv \
+    --outdir ./output \
+    --download_method ftp \
+    -c nextflow.config \
+    -resume
+```
+
+Downloading the data can take some time. Therefore, it could be helpful to run it inside a screen session:
+
+```{bash}
+# Navigate to your fetchngs directory
+cd ~/multimodal-ngs-ubds-2026/pipelines/fetchngs
+
+# Open a new screen
+screen -S fetchngs
+
+# Activaate the conda environments needed for the pipeline execution.
+conda activate py39
+conda activate --stack nextflow-env
+```
+
+## 5.2 Run `fetchngs`
+
+The checkpoints to go through before launcing the pipeline:
+
+- Make sure your input is correct
+- Make sure you have defined the output directories
+- Make sure you have your `nextflow-env` and `py39` environment active
+- Start the pipeline
+
+```{bash}
+# Run the script
+./run_fetchngs.sh
+
+# Detach — the download will continue in the background
+# Ctrl + A, then D
+
+# Come back later to check progress
+screen -r fetchngs
+tail -f logs/fetchngs.log
+```
+
+---
+
+# 6. Renaming the downloaded files
+
+After `fetchngs` completes, files will have SRR-based names. We rename them to
+meaningful sample names that reflect technique, zone, cell type, and replicate number. 
+The names to be renamed with can be found in `sample_metadata.csv` column `Renamed to` or in this tutorial file in section `1.2 Data on NCBI GEO`
+
+Execute the following commands in your `/fetchngs` directory:
+
+```{bash}
+mkdir fastq_renamed # we will use this directory to save here the renamed fastq files
+touch rename.sh # we will use this script to rename our fastq files to a readable format
+chmod +x rename.sh # make the .sh file executable
+```
+
+Modify your `rename.sh` file by including there a script for renaming the files. Make sure you double check it with the table `sample_metadata.csv` or section `1.2 Data on NCBI GEO`
+
+```{bash, echo=TRUE, include=TRUE}
+#!/bin/bash
+
+set -euo pipefail
+
+FASTQ_DIR="./output/fastq"  # fetchngs output directory
+RENAMED_DIR="./fastq_renamed"  # destination for renamed files
+
+mkdir -p "${RENAMED_DIR}"
+
+# SRR accession → custom sample name
+declare -A SAMPLES=(
+    ["SRR12761392"]="RNA_Zone1_mOSN_Rep1"
+    ["SRR12761393"]="RNA_Zone1_mOSN_Rep2"
+    ["SRR12761394"]="RNA_Zone1_mOSN_Rep3"
+    ["SRR12761403"]="RNA_Zone5_mOSN_Rep1"
+    ["SRR12761404"]="RNA_Zone5_mOSN_Rep2"
+    ["SRR12761405"]="RNA_Zone5_mOSN_Rep3"
+    ["SRR12761412"]="RNA_Zone2_mOSN_Rep1"
+    ["SRR12761413"]="RNA_Zone2_mOSN_Rep2"
+    ["SRR12761446"]="ChIP_Zone1_mOSN_Rep1"
+    ["SRR12761451"]="ChIP_Zone1_mOSN_Rep2"
+    ["SRR12761448"]="ChIP_Zone2_mOSN_Rep1"
+    ["SRR12761452"]="ChIP_Zone2_mOSN_Rep2"
+    ["SRR12761450"]="ChIP_Zone5_mOSN_Rep1"
+    ["SRR12761453"]="ChIP_Zone5_mOSN_Rep2"
+    ["SRR12761463"]="ChIP_Bulk_mOSN_Rep1"
+)
+
+for SRR in "${!SAMPLES[@]}"; do
+    NEW_NAME="${SAMPLES[$SRR]}"
+
+    R1_SRC=$(ls "${FASTQ_DIR}/"*"${SRR}_1.fastq.gz" 2>/dev/null | head -1)
+    R2_SRC=$(ls "${FASTQ_DIR}/"*"${SRR}_2.fastq.gz" 2>/dev/null | head -1)
+
+    if [[ -f "${R1_SRC}" && -f "${R2_SRC}" ]]; then
+        cp "${R1_SRC}" "${RENAMED_DIR}/${NEW_NAME}_R1.fastq.gz"
+        cp "${R2_SRC}" "${RENAMED_DIR}/${NEW_NAME}_R2.fastq.gz"
+        echo "[OK] ${SRR} → ${NEW_NAME}_R1/R2.fastq.gz"
+    else
+        echo "[WARN] Files not found for ${SRR}, skipping."
+    fi
+done
+
+echo ""
+echo "Done. Renamed files are in: ${RENAMED_DIR}"
+
+```
+
+Run `rename.sh` script.
+```{bash}
+./rename.sh 
+```
+
+You should see these lines appearing on your terminal screen as the execution of the script progresses:
+```{bash}
+[OK] SRR12761448 → ChIP_Zone2_mOSN_Rep1_R1/R2.fastq.gz
+[OK] SRR12761446 → ChIP_Zone1_mOSN_Rep1_R1/R2.fastq.gz
+[OK] SRR12761412 → RNA_Zone2_mOSN_Rep1_R1/R2.fastq.gz
+[OK] SRR12761413 → RNA_Zone2_mOSN_Rep2_R1/R2.fastq.gz
+[OK] SRR12761463 → ChIP_Bulk_mOSN_Rep1_R1/R2.fastq.gz
+[OK] SRR12761403 → RNA_Zone5_mOSN_Rep1_R1/R2.fastq.gz
+[OK] SRR12761405 → RNA_Zone5_mOSN_Rep3_R1/R2.fastq.gz
+[OK] SRR12761404 → RNA_Zone5_mOSN_Rep2_R1/R2.fastq.gz
+[OK] SRR12761393 → RNA_Zone1_mOSN_Rep2_R1/R2.fastq.gz
+[OK] SRR12761392 → RNA_Zone1_mOSN_Rep1_R1/R2.fastq.gz
+[OK] SRR12761394 → RNA_Zone1_mOSN_Rep3_R1/R2.fastq.gz
+[OK] SRR12761452 → ChIP_Zone2_mOSN_Rep2_R1/R2.fastq.gz
+[OK] SRR12761453 → ChIP_Zone5_mOSN_Rep2_R1/R2.fastq.gz
+[OK] SRR12761450 → ChIP_Zone5_mOSN_Rep1_R1/R2.fastq.gz
+[OK] SRR12761451 → ChIP_Zone1_mOSN_Rep2_R1/R2.fastq.gz
+```
+
+Re-confirm that the names match our metadata table. Navigate to `/fastq_renamed` directory and check the output.
+
+---
+
+# Summary of today
+
+| Step | Tool | Output |
+|------|------|--------|
+| Data discovery | NCBI GEO | SRR accession numbers |
+| Data download | nf-core/fetchngs | Raw FASTQ files |
+| Sample renaming | bash script | Renamed FASTQ files |
+
+---
+
+*By Lisa Korneeva with some help of Claude Sonnet 4.6*

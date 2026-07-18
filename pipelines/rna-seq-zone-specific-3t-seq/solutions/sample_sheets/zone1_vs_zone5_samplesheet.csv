@@ -1,0 +1,7 @@
+name,filename_1,filename_2,zone
+RNA_Zone1_mOSN_Rep1,/home/lisa/multimodal-ngs-ubds-2026/pipelines/fetchngs/solutions/fastq_renamed/RNA_Zone1_mOSN_Rep1_R1.fastq.gz,/home/lisa/multimodal-ngs-ubds-2026/pipelines/fetchngs/solutions/fastq_renamed/RNA_Zone1_mOSN_Rep1_R2.fastq.gz,zone1
+RNA_Zone1_mOSN_Rep2,/home/lisa/multimodal-ngs-ubds-2026/pipelines/fetchngs/solutions/fastq_renamed/RNA_Zone1_mOSN_Rep2_R1.fastq.gz,/home/lisa/multimodal-ngs-ubds-2026/pipelines/fetchngs/solutions/fastq_renamed/RNA_Zone1_mOSN_Rep2_R2.fastq.gz,zone1
+RNA_Zone1_mOSN_Rep3,/home/lisa/multimodal-ngs-ubds-2026/pipelines/fetchngs/solutions/fastq_renamed/RNA_Zone1_mOSN_Rep3_R1.fastq.gz,/home/lisa/multimodal-ngs-ubds-2026/pipelines/fetchngs/solutions/fastq_renamed/RNA_Zone1_mOSN_Rep3_R2.fastq.gz,zone1
+RNA_Zone5_mOSN_Rep1,/home/lisa/multimodal-ngs-ubds-2026/pipelines/fetchngs/solutions/fastq_renamed/RNA_Zone5_mOSN_Rep1_R1.fastq.gz,/home/lisa/multimodal-ngs-ubds-2026/pipelines/fetchngs/solutions/fastq_renamed/RNA_Zone5_mOSN_Rep1_R2.fastq.gz,zone5
+RNA_Zone5_mOSN_Rep2,/home/lisa/multimodal-ngs-ubds-2026/pipelines/fetchngs/solutions/fastq_renamed/RNA_Zone5_mOSN_Rep2_R1.fastq.gz,/home/lisa/multimodal-ngs-ubds-2026/pipelines/fetchngs/solutions/fastq_renamed/RNA_Zone5_mOSN_Rep2_R2.fastq.gz,zone5
+RNA_Zone5_mOSN_Rep3,/home/lisa/multimodal-ngs-ubds-2026/pipelines/fetchngs/solutions/fastq_renamed/RNA_Zone5_mOSN_Rep3_R1.fastq.gz,/home/lisa/multimodal-ngs-ubds-2026/pipelines/fetchngs/solutions/fastq_renamed/RNA_Zone5_mOSN_Rep3_R2.fastq.gz,zone5

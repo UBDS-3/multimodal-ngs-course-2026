@@ -1,0 +1,10 @@
+Sample Name,GSM accecion,SRR accession,To be renamed,Zone,Genotype,Cre Driver,Sort/Reporter,Differentiation Stage,Replicate
+RNAseq_Zone1_Mash1CreER_Ngn1GFPbright_r1,GSM4815268,SRR12761386,Zone1_INP_Rep1,Zone 1,Wild-type,Mash1CreER (Ascl1),Ngn1-GFP bright (FACS sorted),INP,1
+RNAseq_Zone1_Mash1CreER_Ngn1GFPbright_r2,GSM4815269,SRR12761387,Zone1_INP_Rep2,Zone 1,Wild-type,Mash1CreER (Ascl1),Ngn1-GFP bright (FACS sorted),INP,2
+RNAseq_Zone1_Mash1CreER_Ngn1GFPbright_r3,GSM4815270,SRR12761388,Zone1_INP_Rep3,Zone 1,Wild-type,Mash1CreER (Ascl1),Ngn1-GFP bright (FACS sorted),INP,3
+RNAseq_Zone1_Ngn1GFPbright_r1,GSM4815271,SRR12761389,Zone1_iOSN_Rep1,Zone 1,Wild-type,None,Ngn1-GFP bright (FACS sorted),iOSN,1
+RNAseq_Zone1_Ngn1GFPbright_r2,GSM4815272,SRR12761390,Zone1_iOSN_Rep2,Zone 1,Wild-type,None,Ngn1-GFP bright (FACS sorted),iOSN,2
+RNAseq_Zone1_Ngn1GFPbright_r3,GSM4815273,SRR12761391,Zone1_iOSN_Rep3,Zone 1,Wild-type,None,Ngn1-GFP bright (FACS sorted),iOSN,3
+RNAseq_Zone1_Ngn1GFPdim_r1,GSM4815274 ,SRR12761392,Zone1_mOSN_Rep1,Zone 1,Wild-type,None,Ngn1-GFP dim (FACS sorted),mOSN,1
+RNAseq_Zone1_Ngn1GFPdim_r2,GSM4815275,SRR12761393,Zone1_mOSN_Rep2,Zone 1,Wild-type,None,Ngn1-GFP dim (FACS sorted),mOSN,2
+RNAseq_Zone1_Ngn1GFPdim_r3,GSM4815276,SRR12761394,Zone1_mOSN_Rep3,Zone 1,Wild-type,None,Ngn1-GFP dim (FACS sorted),mOSN,3
