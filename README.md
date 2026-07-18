@@ -1,19 +1,19 @@
-# Multimodal NGS Analysis of Gene Expression and Chromatin State in the Olfactory Epithelium
+# Multimodal NGS analysis of gene expression and chromatin state in the olfactory epithelium
 
-**UBDS Summer School 2026**
+**UBDS^3 | 2026**
 
 ---
 
 ## About this course
 
-This course introduces next-generation sequencing (NGS) technologies and their application in biological research, using the mouse olfactory system as a model. The olfactory epithelium is organized into distinct spatial zones, each expressing a unique subset of olfactory receptor genes — a striking example of zone-specific gene regulation that remains incompletely understood.
+This course introduces next-generation sequencing (NGS) technologies and their application in biological research, using the mouse olfactory system as a model. The olfactory epithelium is organized into distinct spatial zones, each expressing a unique subset of olfactory receptor genes - a striking example of zone-specific gene regulation that remains incompletely understood.
 
 You will perform hands-on computational analysis of two complementary NGS datasets:
 
 - **RNA-seq** from mature olfactory sensory neurons isolated from different epithelial zones
 - **ChIP-seq** targeting H3K9me3, a histone modification associated with heterochromatin and gene silencing
 
-By the end of the course, you will have a conceptual and practical foundation in multimodal NGS data analysis, and will have gained mechanistic insight into the transcriptional and epigenetic regulation of zone-specific olfactory receptor expression.
+By the end of the course, you will have a conceptual and practical foundation in NGS data analysis, and will have gained mechanistic insight into the transcriptional and epigenetic regulation of zone-specific olfactory receptor expression.
 
 ---
 
