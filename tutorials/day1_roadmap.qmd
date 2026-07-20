@@ -313,7 +313,7 @@ Downloading the data can take some time. Therefore, it could be helpful to run i
 
 ```{bash}
 # Navigate to your fetchngs directory
-cd ~/multimodal-ngs-ubds-2026/pipelines/fetchngs
+cd ~/multimodal-ngs-course-2026/pipelines/fetchngs
 
 # Open a new screen
 screen -S fetchngs

@@ -1,0 +1,434 @@
+---
+title: "Multimodal NGS analysis of gene expression and chromatin state in olfactory epithelium"
+subtitle: "Day 3 — RNA-seq results — Exercises"
+author: "Lisa Korneeva"
+date: today
+format:
+  html:
+    self-contained: true
+    toc: true
+    toc-location: left
+    toc-depth: 3
+    theme:
+      - flatly
+      - custom.scss
+    highlight-style: github
+    code-fold: show
+execute:
+  echo: true
+  eval: false
+  warning: false
+  message: false
+---
+
+# Overview
+
+Today we explore the results of the RNA-seq pipeline. We will:
+
+- Load raw count data from STAR output
+- Construct a DESeq2 object and run differential expression analysis
+- Assess data quality with PCA and sample distance heatmaps
+- Visualise results with MA plots and volcano plots
+- Perform gene ontology enrichment analysis with clusterProfiler
+
+---
+
+# 1. Setup
+
+## 1.1 Load libraries
+
+Load the following libraries. Install any that are missing using `BiocManager::install()` or `install.packages()`.
+
+```{r}
+library(here)
+library(DESeq2)
+library(tidyverse)
+library(ggplot2)
+library(ggrepel)
+library(pheatmap)
+library(clusterProfiler)
+library(org.Mm.eg.db)
+library(biomaRt)
+```
+
+## 1.2 Define paths
+
+Use `here()` to define the path to your count files. The `ReadsPerGene.out.tab` files are located in the `results/alignments/star/_shared/` directory of the pipeline output.
+
+```{r}
+# Define path to count files using here()
+counts_dir <- here(...)
+
+# Use list.files() to find all ReadsPerGene.out.tab files recursively
+count_files <- list.files(
+  counts_dir,
+  pattern    = "ReadsPerGene.out.tab",
+  recursive  = TRUE,
+  full.names = TRUE
+)
+
+# Extract sample names from paths and set as names
+# Hint: use dirname() and basename() on count_files
+sample_names <- ...
+names(count_files) <- sample_names
+```
+
+---
+
+# 2. Load and prepare count data
+
+## 2.1 Load ReadsPerGene files
+
+STAR's `ReadsPerGene.out.tab` has 4 columns:
+
+| Column | Content |
+|--------|---------|
+| 1 | Gene ID |
+| 2 | Unstranded counts |
+| 3 | Forward-stranded counts |
+| 4 | Reverse-stranded counts |
+
+> **Question:** Which column should we use for the NuQuant library preparation kit, and why?
+
+The first 4 rows are summary statistics — skip them with `skip = 4`.
+
+```{r}
+# Load all count files using lapply()
+# Read each file with read.table(), skip the first 4 rows, use column 1 as row names
+# Extract only the forward-stranded column (column 2 after skipping col 1 with row.names)
+count_list <- lapply(count_files, function(f) {
+  # Hint: read.table(f, header = FALSE, skip = 4, row.names = 1)[, COLUMN, drop = FALSE]
+  ...
+})
+
+# Combine into a count matrix using do.call(cbind, ...)
+count_matrix <- ...
+colnames(count_matrix) <- names(count_files)
+
+# Check dimensions — should be ~55450 genes x 8 samples
+dim(count_matrix)
+head(count_matrix)
+```
+
+## 2.2 Add gene symbols
+
+Use `biomaRt` to retrieve gene symbols for all Ensembl IDs in your count matrix.
+
+```{r}
+# Connect to Ensembl for mouse
+# Hint: useMart("ensembl", dataset = "mmusculus_gene_ensembl")
+mart <- ...
+
+# Retrieve gene symbols using getBM()
+# Attributes needed: "ensembl_gene_id", "external_gene_name", "gene_biotype"
+# Filter by "ensembl_gene_id" using rownames(count_matrix)
+gene_info <- getBM(
+  attributes = c(...),
+  filters    = ...,
+  values     = ...,
+  mart       = mart
+)
+
+head(gene_info)
+```
+
+## 2.3 Create sample metadata
+
+```{r}
+# Create a data frame describing your samples
+# Columns: sample, zone, replicate
+# Make zone a factor
+coldata <- data.frame(
+  sample    = colnames(count_matrix),
+  zone      = factor(c(...)),  # fill in zone assignments
+  replicate = c(...)           # fill in replicate numbers
+)
+rownames(coldata) <- coldata$sample
+coldata
+```
+
+> **Question:** Why do we need to make `zone` a factor? What happens if we leave it as a character vector?
+
+---
+
+# 3. DESeq2 analysis
+
+## 3.1 Create DESeq2 object
+
+```{r}
+# Create DESeqDataSet from count matrix
+# design = ~ zone (we want to test for differences between zones)
+dds_all <- DESeqDataSetFromMatrix(
+  countData = ...,
+  colData   = ...,
+  design    = ...
+)
+
+# Pre-filter: keep only genes with at least 10 counts in at least 3 samples
+# Hint: rowSums(counts(dds_all) >= 10) >= 3
+keep <- ...
+dds_all <- dds_all[keep, ]
+
+# How many genes remain after filtering?
+nrow(dds_all)
+```
+
+> **Question:** Why do we filter out lowly expressed genes before running DESeq2?
+
+## 3.2 Run DESeq2
+
+```{r}
+# Run the DESeq2 pipeline
+# This normalises counts, estimates dispersions, and fits the negative binomial model
+dds_all <- DESeq(dds_all)
+```
+
+---
+
+# 4. Quality control
+
+## 4.1 PCA
+
+A PCA plot shows how similar samples are to each other overall. Samples from the same zone should cluster together.
+
+```{r}
+# Apply variance stabilising transformation (VST) for visualisation
+# Hint: vst(dds_all, blind = FALSE)
+vsd <- ...
+
+# Generate PCA data
+# Hint: plotPCA(vsd, intgroup = "zone", returnData = TRUE)
+pca_data    <- ...
+percent_var <- round(100 * attr(pca_data, "percentVar"))
+
+# Plot PCA using ggplot2
+# Colour by zone, label by sample name using geom_text_repel()
+ggplot(pca_data, aes(x = PC1, y = PC2, colour = zone, label = name)) +
+  ...
+```
+
+> **Questions:**
+>
+> 1. Do samples cluster by zone as expected?
+> 2. How much variance is explained by PC1 and PC2?
+> 3. Is there any sample that looks like an outlier?
+
+## 4.2 Sample distance heatmap
+
+```{r}
+# Calculate Euclidean distances between samples in VST space
+sampleDists      <- dist(t(assay(vsd)))
+sampleDistMatrix <- as.matrix(sampleDists)
+
+# Plot heatmap using pheatmap()
+# Add zone annotation to columns
+annotation_col <- data.frame(
+  zone = coldata$zone,
+  row.names = rownames(coldata)
+)
+
+pheatmap(
+  sampleDistMatrix,
+  clustering_distance_rows = sampleDists,
+  clustering_distance_cols = sampleDists,
+  annotation_col           = annotation_col,
+  main                     = "Sample-to-sample distances"
+)
+```
+
+> **Question:** Which samples are most similar to each other? Does this make biological sense?
+
+---
+
+# 5. Pairwise comparisons
+
+## 5.1 Extract DESeq2 results
+
+```{r}
+# Extract results for Zone 1 vs Zone 2
+# Hint: results(dds_all, contrast = c("zone", "zone1", "zone2"), alpha = 0.05)
+# Apply LFC shrinkage with lfcShrink(..., type = "ashr")
+res_z1_z2 <- ...
+
+# Convert to data frame, add gene symbols from gene_info
+# Hint: as.data.frame(res) |> rownames_to_column("ensembl_gene_id") |> left_join(gene_info, ...)
+res_z1_z2 <- ...
+
+# Repeat for Zone 1 vs Zone 5
+res_z1_z5 <- ...
+
+# Repeat for Zone 2 vs Zone 5
+res_z2_z5 <- ...
+
+head(res_z1_z2)
+```
+
+> **Question:** What does LFC shrinkage do and why is it recommended for visualisation?
+
+## 5.2 How many genes are differentially expressed?
+
+```{r}
+# For each comparison, count:
+# - Total significant genes (padj < 0.05)
+# - Upregulated genes (padj < 0.05 AND log2FoldChange > 1)
+# - Downregulated genes (padj < 0.05 AND log2FoldChange < -1)
+
+# Hint: use filter() and summarise() from dplyr
+
+# Zone 1 vs Zone 2
+res_z1_z2 |>
+  filter(!is.na(padj), padj < 0.05) |>
+  summarise(
+    total         = n(),
+    upregulated   = sum(log2FoldChange > 1),
+    downregulated = sum(log2FoldChange < -1)
+  )
+```
+
+> **Exercise:** Do the same for Zone 1 vs Zone 5 and Zone 2 vs Zone 5.
+
+---
+
+# 6. Visualisation
+
+## 6.1 MA plot
+
+An MA plot shows:
+- **X-axis:** mean expression across all samples (log scale)
+- **Y-axis:** log2 fold change between conditions
+
+Significant genes (padj < 0.05, |log2FC| > 1) should be highlighted.
+
+```{r}
+# Create an MA plot for Zone 1 vs Zone 2
+# Hint: use ggplot() with geom_point()
+# Colour points by significance (padj < 0.05 & abs(log2FoldChange) > 1)
+# Add horizontal lines at y = 0 and y = ±1 with geom_hline()
+
+res_z1_z2 |>
+  filter(!is.na(padj)) |>
+  mutate(significant = ...) |>
+  ggplot(aes(x = ..., y = ..., colour = ...)) +
+  geom_point(...) +
+  ...
+```
+
+> **Exercise:** Create MA plots for the other two comparisons.
+>
+> **Question:** What do genes in the upper right of the MA plot represent?
+
+## 6.2 Volcano plot
+
+A volcano plot shows:
+- **X-axis:** log2 fold change (effect size)
+- **Y-axis:** -log10 adjusted p-value (significance)
+
+```{r}
+# Create a volcano plot for Zone 1 vs Zone 2
+# Colour points by significance category:
+#   - "Up in Zone 1": padj < 0.05 AND log2FoldChange > 1
+#   - "Up in Zone 2": padj < 0.05 AND log2FoldChange < -1
+#   - "Not significant": everything else
+# Label the top 20 genes by adjusted p-value using geom_text_repel()
+
+res_z1_z2 |>
+  filter(!is.na(padj), !is.na(log2FoldChange)) |>
+  mutate(significance = case_when(
+    padj < 0.05 & log2FoldChange >  1 ~ "Up in Zone 1",
+    padj < 0.05 & log2FoldChange < -1 ~ "Up in Zone 2",
+    TRUE ~ "Not significant"
+  )) |>
+  ggplot(aes(x = log2FoldChange,
+             y = -log10(padj),
+             colour = significance)) +
+  ...
+```
+
+> **Exercise:** Repeat for the other two comparisons.
+>
+> **Question:** Are any olfactory receptor genes (starting with "Olfr") among the top hits?
+> Hint: `filter(str_starts(external_gene_name, "Olfr"))`
+
+## 6.3 Heatmap of top DE genes
+
+```{r}
+# Select the top 50 DE genes across all comparisons
+# Hint: bind_rows() the three result tables, filter significant genes,
+# arrange by padj, pull ensembl_gene_id, unique(), head(50)
+top_genes_all <- ...
+
+# Extract normalised counts for these genes
+# Hint: counts(dds_all, normalized = TRUE)
+norm_counts <- ...
+top_counts  <- norm_counts[rownames(norm_counts) %in% top_genes_all, ]
+
+# Replace Ensembl IDs with gene symbols as row names
+# Hint: match() to align gene_info with rownames(top_counts)
+rownames(top_counts) <- ...
+
+# Plot heatmap
+pheatmap(
+  log2(top_counts + 1),
+  scale          = "row",
+  show_rownames  = TRUE,
+  annotation_col = data.frame(zone = coldata$zone, row.names = rownames(coldata)),
+  main           = "Top 50 DE genes"
+)
+```
+
+> **Question:** Do you see clear zone-specific expression patterns? Which genes are most specifically expressed in one zone?
+
+---
+
+# 7. Gene ontology enrichment analysis
+
+Gene ontology (GO) enrichment analysis tests whether a set of genes (e.g. the genes upregulated in Zone 1) is statistically enriched for specific biological functions, processes, or cellular components.
+
+```{r}
+# Get significantly upregulated genes in Zone 1 vs Zone 2
+# Hint: filter(padj < 0.05, log2FoldChange > 1) |> pull(ensembl_gene_id)
+up_z1 <- ...
+
+# Run GO enrichment using enrichGO() from clusterProfiler
+# OrgDb = org.Mm.eg.db (mouse annotation database)
+# keyType = "ENSEMBL"
+# ont = "BP" (Biological Process)
+ego_z1 <- enrichGO(
+  gene          = up_z1,
+  OrgDb         = ...,
+  keyType       = ...,
+  ont           = ...,
+  pAdjustMethod = "BH",
+  pvalueCutoff  = 0.05,
+  readable      = TRUE
+)
+
+# Visualise results
+# Hint: dotplot(ego_z1, showCategory = 20)
+dotplot(...)
+```
+
+> **Questions:**
+>
+> 1. What biological processes are enriched in Zone 1 upregulated genes?
+> 2. Does this make biological sense given what you know about olfactory receptor expression?
+> 3. Try running the same analysis for Zone 5 upregulated genes. Are the enriched terms different?
+
+---
+
+# 8. Save your results
+
+```{r}
+# Save your DESeq2 results tables as CSV files
+# Hint: write_csv(res_z1_z2, here("analysis", "exercises", "results_zone1_vs_zone2.csv"))
+write_csv(res_z1_z2, ...)
+write_csv(res_z1_z5, ...)
+write_csv(res_z2_z5, ...)
+
+# Save the DESeq2 object for use on Day 5
+saveRDS(dds_all, here("analysis", "exercises", "dds_all.rds"))
+```
+
+---
+
+*Lisa Korneeva — Boulard Lab, EMBL Heidelberg*

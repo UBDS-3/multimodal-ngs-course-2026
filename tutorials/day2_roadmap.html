@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Lisa Korneeva">
-<meta name="dcterms.date" content="2026-07-17">
+<meta name="dcterms.date" content="2026-07-21">
 
 <title>Multimodal NGS analysis of gene expression and chromatin state in olfactory epithelium</title>
 <style>
@@ -3090,7 +3090,7 @@ vertical-align: -.125em;
   <li><a href="#introduction-to-3t-seq" id="toc-introduction-to-3t-seq" class="nav-link" data-scroll-target="#introduction-to-3t-seq">1. Introduction to 3t-seq</a>
   <ul class="collapse">
   <li><a href="#what-is-3t-seq" id="toc-what-is-3t-seq" class="nav-link" data-scroll-target="#what-is-3t-seq">1.1 What is 3t-seq?</a></li>
-  <li><a href="#what-is-snakemake" id="toc-what-is-snakemake" class="nav-link" data-scroll-target="#what-is-snakemake">1.3 What is Snakemake?</a></li>
+  <li><a href="#what-is-snakemake" id="toc-what-is-snakemake" class="nav-link" data-scroll-target="#what-is-snakemake">1.2 What is Snakemake?</a></li>
   </ul></li>
   <li><a href="#initializing-the-environment-for-the-pipeline" id="toc-initializing-the-environment-for-the-pipeline" class="nav-link" data-scroll-target="#initializing-the-environment-for-the-pipeline">2. Initializing the environment for the pipeline</a>
   <ul class="collapse">
@@ -3142,7 +3142,7 @@ vertical-align: -.125em;
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">July 17, 2026</p>
+      <p class="date">July 21, 2026</p>
     </div>
   </div>
   
@@ -3206,7 +3206,7 @@ vertical-align: -.125em;
 </blockquote>
 </section>
 <section id="what-is-snakemake" class="level2">
-<h2 class="anchored" data-anchor-id="what-is-snakemake">1.3 What is Snakemake?</h2>
+<h2 class="anchored" data-anchor-id="what-is-snakemake">1.2 What is Snakemake?</h2>
 <p>3t-seq is built on top of <a href="https://snakemake.readthedocs.io">Snakemake</a> — a workflow management system that defines analysis pipelines as a set of rules, where each rule describes how to produce a specific output from a specific input. Very analogous to <strong>Nextflow</strong> (see <code>day1_roadmap</code>, section 4.2).</p>
 <p>Snakemake automatically:</p>
 <ul>
@@ -3258,7 +3258,7 @@ vertical-align: -.125em;
 <div class="cell">
 <details open class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> ~/multimodal_ngs_course_ubds_2026/pipelines/rna-seq-zone-specific-3t-seq</span>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> /home/YOUR_USER/multimodal-ngs-course-2026/pipelines/rna-seq-zone-specific-3t-seq</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clone <span class="at">-b</span> dev https://github.com/boulardlab/3t-seq.git</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> 3t-seq</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
