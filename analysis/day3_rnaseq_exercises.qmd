@@ -68,7 +68,7 @@ count_files <- list.files(
 )
 
 # Extract sample names from paths and set as names
-# Hint: use dirname() and basename() on count_files
+# Hint: use basename() on count_files
 sample_names <- ...
 names(count_files) <- sample_names
 ```
@@ -116,18 +116,21 @@ Use `biomaRt` to retrieve gene symbols for all Ensembl IDs in your count matrix.
 
 ```{r}
 # Connect to Ensembl for mouse
-# Hint: useMart("ensembl", dataset = "mmusculus_gene_ensembl")
-mart <- ...
+mart <- useEnsembl(
+  biomart = "ensembl",
+  dataset = "mmusculus_gene_ensembl",
+  version = 105
+)
 
-# Retrieve gene symbols using getBM()
-# Attributes needed: "ensembl_gene_id", "external_gene_name", "gene_biotype"
-# Filter by "ensembl_gene_id" using rownames(count_matrix)
 gene_info <- getBM(
-  attributes = c(...),
-  filters    = ...,
-  values     = ...,
+  attributes = c("ensembl_gene_id", "external_gene_name", "gene_biotype"),
+  filters    = "ensembl_gene_id",
+  values     = rownames(count_matrix),
   mart       = mart
 )
+
+# Check if Olfr names are there
+gene_info |> filter(grepl("^Olfr", external_gene_name)) |> head(10)
 
 head(gene_info)
 ```
