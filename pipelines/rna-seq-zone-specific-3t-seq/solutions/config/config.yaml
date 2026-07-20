@@ -2,7 +2,7 @@
 comparisons:
   - name: zone1_vs_zone2
     protocol: pe
-    sample_sheet: /home/lisa/multimodal-ngs-ubds-2026/pipelines/rna-seq-zone-specific-3t-seq/3t-seq/sample_sheets/zone1_vs_zone2_samplesheet.csv
+    sample_sheet: /home/lisa/multimodal-ngs-course-2026/pipelines/rna-seq-zone-specific-3t-seq/3t-seq/sample_sheets/zone1_vs_zone2_samplesheet.csv
     strandedness: 1
     trimmomatic: "ILLUMINACLIP:$CONDA_PREFIX/share/trimmomatic/adapters/TruSeq3-PE.fa:2:30:10 LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 CROP:50 MINLEN:36"
     deseq2:
@@ -12,7 +12,7 @@ comparisons:
     
   - name: zone1_vs_zone5
     protocol: pe
-    sample_sheet: /home/lisa/multimodal-ngs-ubds-2026/pipelines/rna-seq-zone-specific-3t-seq/3t-seq/sample_sheets/zone1_vs_zone5_samplesheet.csv
+    sample_sheet: /home/lisa/multimodal-ngs-course-2026/pipelines/rna-seq-zone-specific-3t-seq/3t-seq/sample_sheets/zone1_vs_zone5_samplesheet.csv
     strandedness: 1
     trimmomatic: "ILLUMINACLIP:$CONDA_PREFIX/share/trimmomatic/adapters/TruSeq3-PE.fa:2:30:10 LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 CROP:50 MINLEN:36"
     deseq2:
@@ -33,7 +33,7 @@ tRNA_quantification:
     min_cov: 10
 
 globals:
-  results_folder: /home/lisa/multimodal-ngs-ubds-2026/pipelines/rna-seq-zone-specific-3t-seq/3t-seq/results
+  results_folder: /home/lisa/multimodal-ngs-course-2026/pipelines/rna-seq-zone-specific-3t-seq/3t-seq/results
 
 genome:
   label: mm10
