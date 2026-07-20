@@ -1,0 +1,418 @@
+---
+title: "Multimodal NGS analysis of gene expression and chromatin state in olfactory
+  epithelium"
+subtitle: "Day 2 — Running the 3t-seq pipeline for RNA-seq data processing"
+author: "Lisa Korneeva"
+date: today
+format:
+  html:
+    grid:
+      body-width: 1000px
+    self-contained: true
+    toc: true
+    toc-location: left
+    toc-depth: 3
+    theme:
+      - flatly
+      - custom.scss
+    highlight-style: github
+    code-fold: show
+execute:
+  echo: true
+  eval: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, eval = FALSE)
+```
+
+---
+
+# Overview
+
+Welcome to Day 2! 
+
+Yesterday we:
+
+- Explored the published dataset and found our samples on **NCBI GEO**
+- Set up the computational environment (conda, Nextflow)
+- Downloaded the raw **RNA-seq** and **ChIP-seq** data using `nf-core/fetchngs`
+- Renamed the downloaded files to meaningful sample names
+
+Today we will:
+
+- Clone, configure and launch the **3t-seq pipeline** to process the RNA-seq data (`fastq` files)
+
+---
+
+# 1. Introduction to 3t-seq
+
+## 1.1 What is 3t-seq?
+
+The **3t-seq pipeline** is a Snakemake-based RNA-seq analysis workflow. It was designed for the analysis of **transposable element (TE), tRNA and transcript** expression analysis. It performs all the standard steps
+of a typical RNA-seq analysis pipeline — from raw read processing to differential
+expression analysis.
+
+For this course, we will use it for standard RNA-seq processing of our olfactory
+epithelium dataset. The TE and tRNA quantification modules will be disabled.
+
+| Resource | Link |
+|----------|------|
+| GitHub repository | [https://github.com/boulardlab/3t-seq](https://github.com/boulardlab/3t-seq) |
+| Manual | [https://boulardlab.github.io/3t-seq](https://boulardlab.github.io/3t-seq) |
+
+> **Exercise:** Before we start, browse the 3t-seq GitHub repository and
+> manual. Try to answer the following questions:
+>
+> 1. What are the main steps of the pipeline?
+> 2. What file does the pipeline use for configuration?
+> 3. What format does the sample sheet need to be in?
+> 4. What genome assemblies and annotation types does the pipeline support?
+
+## 1.3 What is Snakemake?
+
+3t-seq is built on top of [Snakemake](https://snakemake.readthedocs.io) — a workflow management system that
+defines analysis pipelines as a set of rules, where each rule describes how to
+produce a specific output from a specific input. Very analogous to **Nextflow** (see `day1_roadmap`, section 4.2).
+
+Snakemake automatically:
+
+- Determines which steps need to be run based on what outputs already exist
+- Runs independent steps in parallel
+- Retries failed steps
+- Keeps a detailed log of everything that was run
+
+---
+
+# 2. Initializing the environment for the pipeline
+
+To configure the 3t-seq, please refer to the [manual](https://boulardlab.github.io/3t-seq) explaining the steps. Below you can find the compressed instructions.
+
+## 2.1 Install pixi
+The 3t-seq pipeline uses [pixi](https://pixi.sh) for managing its software
+environments. Pixi is a fast, cross-platform package manager built on top of
+the conda ecosystem that handles all tool dependencies automatically.
+
+Navigate to directory `~/multimodal-ngs-ubds-2026/pipelines/rna-seq-zone-specific-3t-seq` and run the following commands:
+
+```{bash}
+curl -fsSL https://pixi.sh/install.sh | bash
+source ~/.bashrc
+pixi --version
+```
+
+## 2.2 Initializing Git LFS 
+
+The 3t-seq pipeline uses **Git LFS** (Large File Storage) to manage large binary
+files that would otherwise bloat the git repository. Without git-lfs installed,
+these files will not be downloaded correctly during cloning.
+
+Install git-lfs (for Ubuntu/Debian):
+```{bash}
+sudo apt install git-lfs
+```
+
+And activate it globally (once per machine):
+```{bash}
+git lfs install
+```
+
+## 2.3 Clone the 3t-seq repository
+
+Clone the 3t-seq repository using the command below. Note that we will be working with the development version. 
+
+```{bash}
+cd ~/multimodal_ngs_course_ubds_2026/pipelines/rna-seq-zone-specific-3t-seq
+git clone -b dev https://github.com/boulardlab/3t-seq.git
+cd 3t-seq
+```
+
+## 2.4 Install the pipeline environment
+
+Install the `dev` pixi environment, which contains Snakemake and all required
+dependencies.
+
+```{bash}
+pixi add --feature dev snakemake-executor-plugin-slurm
+pixi install -e dev
+```
+
+Verify that Snakemake is available:
+
+```{bash}
+pixi run -e dev snakemake --version
+```
+
+---
+
+# 3. Configuring the pipeline
+
+## 3.1 Overview of configuration files
+
+The pipeline requires three types of configuration:
+
+1. **`samplesheet.csv`** - one CSV file per pairwise comparison, listing samples and their FASTQ paths
+2. **`config.yaml`** - global pipeline settings: comparisons, genome, trimming parameters
+3. (optional) profile **`config.yaml`** - resource allocation and general computing instructions for the pipeline execution
+
+## 3.2 Set up the sample sheets
+
+We will run two pairwise comparisons: Zone 1 vs Zone 2, Zone 1 vs Zone 5. Each needs its own sample sheet.
+
+Create the sample sheets directory inside of the `3t-seq` folder:
+```{bash}
+mkdir sample_sheets
+```
+
+Create 2 `.csv` files inside of the `sample_sheets` directory:
+```{bash}
+touch zone1_vs_zone2_samplesheet.csv
+touch zone1_vs_zone5_samplesheet.csv
+```
+
+
+Each sample sheet (a CSV file) has the following columns:
+
+| Column | Description |
+|--------|-------------|
+| `name` | Sample name |
+| `filename_1` | Path to R1 FASTQ file |
+| `filename_2` | Path to R2 FASTQ file |
+| `zone` (can be anything, e.g. `genotype`) | Group variable for DESeq2 |
+
+Example: [https://boulardlab.github.io/3t-seq/tutorial/quickstart/#the-sample-sheet]()https://boulardlab.github.io/3t-seq/tutorial/quickstart/#the-sample-sheet
+
+**Task:** Fill out the sample sheets for 2 pairwise comparisons of our zonal dataset and save them in the `3t-seq/sample_sheets` directory.
+
+> **Solution:** Can be found in `solutions/sample_sheets` folder in `~/multimodal-ngs-ubds-2026/pipelines/rna-seq-zone-specific-3t-seq/`. But I highly recommend you to try setting them up on your own to get a real pipeliner experience :) 
+
+```{bash, echo=FALSE, include=FALSE}
+#!/bin/bash
+# Solution: create all three sample sheets
+
+FASTQ_DIR="/path/to/fastq_renamed"
+SHEET_DIR="sample_sheets"
+mkdir -p $SHEET_DIR
+
+# zone1_vs_zone2
+cat > $SHEET_DIR/zone1_vs_zone2_samplesheet.csv << EOF
+sample,fq1,fq2,zone
+RNA_Zone1_mOSN_Rep1,$FASTQ_DIR/RNA_Zone1_mOSN_Rep1_R1.fastq.gz,$FASTQ_DIR/RNA_Zone1_mOSN_Rep1_R2.fastq.gz,zone1
+RNA_Zone1_mOSN_Rep2,$FASTQ_DIR/RNA_Zone1_mOSN_Rep2_R1.fastq.gz,$FASTQ_DIR/RNA_Zone1_mOSN_Rep2_R2.fastq.gz,zone1
+RNA_Zone1_mOSN_Rep3,$FASTQ_DIR/RNA_Zone1_mOSN_Rep3_R1.fastq.gz,$FASTQ_DIR/RNA_Zone1_mOSN_Rep3_R2.fastq.gz,zone1
+RNA_Zone2_mOSN_Rep1,$FASTQ_DIR/RNA_Zone2_mOSN_Rep1_R1.fastq.gz,$FASTQ_DIR/RNA_Zone2_mOSN_Rep1_R2.fastq.gz,zone2
+RNA_Zone2_mOSN_Rep2,$FASTQ_DIR/RNA_Zone2_mOSN_Rep2_R1.fastq.gz,$FASTQ_DIR/RNA_Zone2_mOSN_Rep2_R2.fastq.gz,zone2
+EOF
+
+# zone1_vs_zone5
+cat > $SHEET_DIR/zone1_vs_zone5_samplesheet.csv << EOF
+sample,fq1,fq2,zone
+RNA_Zone1_mOSN_Rep1,$FASTQ_DIR/RNA_Zone1_mOSN_Rep1_R1.fastq.gz,$FASTQ_DIR/RNA_Zone1_mOSN_Rep1_R2.fastq.gz,zone1
+RNA_Zone1_mOSN_Rep2,$FASTQ_DIR/RNA_Zone1_mOSN_Rep2_R1.fastq.gz,$FASTQ_DIR/RNA_Zone1_mOSN_Rep2_R2.fastq.gz,zone1
+RNA_Zone1_mOSN_Rep3,$FASTQ_DIR/RNA_Zone1_mOSN_Rep3_R1.fastq.gz,$FASTQ_DIR/RNA_Zone1_mOSN_Rep3_R2.fastq.gz,zone1
+RNA_Zone5_mOSN_Rep1,$FASTQ_DIR/RNA_Zone5_mOSN_Rep1_R1.fastq.gz,$FASTQ_DIR/RNA_Zone5_mOSN_Rep1_R2.fastq.gz,zone5
+RNA_Zone5_mOSN_Rep2,$FASTQ_DIR/RNA_Zone5_mOSN_Rep2_R1.fastq.gz,$FASTQ_DIR/RNA_Zone5_mOSN_Rep2_R2.fastq.gz,zone5
+RNA_Zone5_mOSN_Rep3,$FASTQ_DIR/RNA_Zone5_mOSN_Rep3_R1.fastq.gz,$FASTQ_DIR/RNA_Zone5_mOSN_Rep3_R2.fastq.gz,zone5
+EOF
+
+echo "Sample sheets created in $SHEET_DIR/"
+```
+
+## 3.3 Edit the main `config.yaml`
+
+Open the config file from `3t-seq/config/config.yaml` in VS Code (or a text editor of your choice). E.g.:
+
+```{bash}
+nano config/config.yaml
+# or
+vim config/config.yaml
+```
+
+Following the 3t-seq manual, try to configure the `config.yaml` yourself. 
+
+> **Solution:** Can be found in `solutions/config` folder in `~/multimodal-ngs-ubds-2026/pipelines/rna-seq-zone-specific-3t-seq/`. But, again, try to put it together on your own first.
+
+```{yaml, echo=FALSE, include=FALSE}
+comparisons:
+  - name: zone1_vs_zone2
+    protocol: pe
+    sample_sheet: /path/to/multimodal-ngs-ubds-2026/pipelines/rna-seq-zone-specific-3t-seq/3t-seq/sample_sheets/zone1_vs_zone2_samplesheet.csv
+    strandedness: 0
+    trimmomatic: "ILLUMINACLIP:$CONDA_PREFIX/share/trimmomatic/adapters/TruSeq3-PE.fa:2:30:10 CROP:50 LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:36"
+    deseq2:
+      test: Wald
+      variable: zone
+      reference_level: zone2
+    
+  - name: zone1_vs_zone5
+    protocol: pe
+    sample_sheet: /path/to/multimodal-ngs-ubds-2026/pipelines/rna-seq-zone-specific-3t-seq/3t-seq/sample_sheets/zone1_vs_zone5_samplesheet.csv
+    strandedness: 0
+    trimmomatic: "ILLUMINACLIP:$CONDA_PREFIX/share/trimmomatic/adapters/TruSeq3-PE.fa:2:30:10 CROP:50 LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:36"
+    deseq2:
+      test: Wald
+      variable: zone
+      reference_level: zone5
+
+  - name: zone2_vs_zone5
+    protocol: pe
+    sample_sheet: /path/to/multimodal-ngs-ubds-2026/pipelines/rna-seq-zone-specific-3t-seq/3t-seq/sample_sheets/zone2_vs_zone5_samplesheet.csv
+    strandedness: 0
+    trimmomatic: "ILLUMINACLIP:$CONDA_PREFIX/share/trimmomatic/adapters/TruSeq3-PE.fa:2:30:10 CROP:50 LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:36"
+    deseq2:
+      test: Wald
+      variable: zone
+      reference_level: zone5
+
+
+disable_TE_analysis: true
+disable_salmonTE_analysis: true
+disable_tRNA_analysis: true
+
+globals:
+  results_folder: /path/to/multimodal-ngs-ubds-2026/pipelines/rna-seq-zone-specific-3t-seq/3t-seq/results
+
+genome:
+  label: mm10
+  annotation_type: gencode
+```
+
+## 3.4 Setting up the execution profile
+
+The pipeline uses a **Snakemake profile** to configure how jobs are executed.
+The profile controls things like the number of parallel jobs, resource requests,
+and the container system used.
+
+Create your own profile directory:
+
+```{bash}
+mkdir -p 3t-seq/profile/slurm-ubds
+```
+
+Create `profile/slurm-ubds/config.yaml` with the following content:
+
+```{yaml}
+cores: 32
+local-cores: 32
+jobs: 4
+restart-times: 2
+printshellcmds: True
+software-deployment-method:
+  - apptainer
+  - conda
+apptainer-args: "--no-home"
+conda-frontend: conda
+latency-wait: 60
+```
+
+> **Note:** We set `jobs: 4` to run up to 4 Snakemake jobs in parallel, and
+> `cores: 32` to give Snakemake a total of 32 cores to distribute. 
+
+---
+
+# 4. Launching the pipeline
+
+## 4.1 Update `run.sh`
+
+Create `run.sh` file in your `3t-seq/` directory:
+
+```{bash}
+touch run.sh
+chmod +x run.sh
+```
+
+Paste the commands from below to your `run.sh` file. Make sure the paths are correctly pointed to your execution profile and main config:
+
+```{bash}
+pixi run -e dev snakemake \
+    --profile profile/slurm-ubds \
+    --configfile config/config.yaml \
+    --rerun-incomplete
+    #--report report-$(date -I).zip
+```
+
+## 4.2 Do a dry run first
+
+Before launching for real, do a **dry run** to check that Snakemake can resolve
+the full pipeline without errors:
+
+```{bash}
+pixi run -e dev snakemake \
+    --profile profile/config.yaml \
+    --configfile config/config.yaml \
+    --dry-run
+```
+
+This prints all the jobs that will be executed without actually running them.
+Review the output and make sure it looks sensible.
+
+> **Question:** How many jobs does Snakemake plan to run? What are the first steps?
+
+## 4.3 Launch the 3t-seq
+
+Once the dry run looks good, open a screen session and launch the pipeline:
+
+```{bash}
+screen -S 3t-seq
+
+./run.sh
+
+# Detach — the pipeline will keep running in the background
+# Ctrl + A, then D
+```
+
+## 4.4 Monitor progress
+
+```{bash}
+# Reattach to the screen
+screen -r 3t-seq
+
+# Check which steps have completed
+ls results/
+
+# Check the Snakemake log
+tail -f .snakemake/log/*.snakemake.log
+
+# Check disk usage
+du -sh results/
+```
+
+If a step fails, check the log for that specific rule:
+
+```{bash}
+# Check the Snakemake log for errors
+grep "Error\|error\|failed" .snakemake/log/*.snakemake.log | head -20
+```
+
+To rerun only incomplete or failed steps:
+
+```{bash}
+pixi run -e dev snakemake \
+    --profile profile/local \
+    --configfile config/config.yaml \
+    --rerun-incomplete
+```
+
+---
+
+# Summary of today
+
+| Step | Tool | Output |
+|------|------|--------|
+| Pipeline introduction | — | Understanding of 3t-seq and Snakemake |
+| Environment setup | pixi | 3t-seq environments |
+| Repository clone | git + git-lfs | 3t-seq code |
+| Sample sheets | CSV files | Per-comparison sample lists |
+| Pipeline configuration | config.yaml | Comparison definitions |
+| Profile configuration | config.yaml | Resource allocation |
+| Pipeline execution | Snakemake | Alignments, counts, QC reports, etc. |
+
+---
+
+# Next steps
+
+Tomorrow we will explore the 3t-seq results, including QC reports and DESeq2 insights.
+
+---
+
+*By Lisa Korneeva with some help of Claude Sonnet 4.6*
