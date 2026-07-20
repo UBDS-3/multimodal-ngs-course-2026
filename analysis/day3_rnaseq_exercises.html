@@ -6,8 +6,8 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="author" content="Your name">
-<meta name="dcterms.date" content="2026-07-19">
+<meta name="author" content="Lisa Korneeva">
+<meta name="dcterms.date" content="2026-07-21">
 
 <title>Multimodal NGS analysis of gene expression and chromatin state in olfactory epithelium</title>
 <style>
@@ -3117,7 +3117,6 @@ vertical-align: -.125em;
   <ul class="collapse">
   <li><a href="#ma-plot" id="toc-ma-plot" class="nav-link" data-scroll-target="#ma-plot">6.1 MA plot</a></li>
   <li><a href="#volcano-plot" id="toc-volcano-plot" class="nav-link" data-scroll-target="#volcano-plot">6.2 Volcano plot</a></li>
-  <li><a href="#heatmap-of-top-de-genes" id="toc-heatmap-of-top-de-genes" class="nav-link" data-scroll-target="#heatmap-of-top-de-genes">6.3 Heatmap of top DE genes</a></li>
   </ul></li>
   <li><a href="#gene-ontology-enrichment-analysis" id="toc-gene-ontology-enrichment-analysis" class="nav-link" data-scroll-target="#gene-ontology-enrichment-analysis">7. Gene ontology enrichment analysis</a></li>
   <li><a href="#save-your-results" id="toc-save-your-results" class="nav-link" data-scroll-target="#save-your-results">8. Save your results</a></li>
@@ -3141,14 +3140,14 @@ vertical-align: -.125em;
     <div>
     <div class="quarto-title-meta-heading">Author</div>
     <div class="quarto-title-meta-contents">
-             <p>Your name </p>
+             <p>Lisa Korneeva </p>
           </div>
   </div>
     
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">July 19, 2026</p>
+      <p class="date">July 21, 2026</p>
     </div>
   </div>
   
@@ -3194,7 +3193,7 @@ vertical-align: -.125em;
 </section>
 <section id="define-paths" class="level2">
 <h2 class="anchored" data-anchor-id="define-paths">1.2 Define paths</h2>
-<p>Use <code>here()</code> to define the path to your count files. The <code>ReadsPerGene.out.tab</code> files are located in the <code>results/alignments/star/_shared/</code> directory of the pipeline output.</p>
+<p>Use <code>here()</code> to define the path to your count files. The <code>ReadsPerGene.out.tab</code> files are located in the <code>/home/YOUR_USER/multimodal-ngs-course-2026/pipelines/rna-seq-zone-specific-3t-seq/solutions/results/alignments</code> directory of the pipeline output.</p>
 <div class="cell">
 <details open class="code-fold">
 <summary>Code</summary>
@@ -3268,7 +3267,7 @@ vertical-align: -.125em;
 <span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>count_matrix <span class="ot">&lt;-</span> ...</span>
 <span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(count_matrix) <span class="ot">&lt;-</span> <span class="fu">names</span>(count_files)</span>
 <span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Check dimensions — should be ~55450 genes x 8 samples</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Check dimensions </span></span>
 <span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(count_matrix)</span>
 <span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(count_matrix)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
@@ -3434,7 +3433,7 @@ vertical-align: -.125em;
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract results for Zone 1 vs Zone 2</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Hint: results(dds_all, contrast = c(&quot;zone&quot;, &quot;zone1&quot;, &quot;zone2&quot;), alpha = 0.05)</span></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Apply LFC shrinkage with lfcShrink(..., type = &quot;ashr&quot;)</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Apply LFC shrinkage with lfcShrink(..., type = &quot;apeglm&quot;)</span></span>
 <span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>res_z1_z2 <span class="ot">&lt;-</span> ...</span>
 <span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert to data frame, add gene symbols from gene_info</span></span>
@@ -3511,7 +3510,11 @@ vertical-align: -.125em;
 </section>
 <section id="volcano-plot" class="level2">
 <h2 class="anchored" data-anchor-id="volcano-plot">6.2 Volcano plot</h2>
-<p>A volcano plot shows: - <strong>X-axis:</strong> log2 fold change (effect size) - <strong>Y-axis:</strong> -log10 adjusted p-value (significance)</p>
+<p>A volcano plot shows:</p>
+<ul>
+<li><strong>X-axis:</strong> log2 fold change (effect size)</li>
+<li><strong>Y-axis:</strong> -log10 adjusted p-value (significance)</li>
+</ul>
 <div class="cell">
 <details open class="code-fold">
 <summary>Code</summary>
@@ -3539,39 +3542,6 @@ vertical-align: -.125em;
 <p><strong>Exercise:</strong> Repeat for the other two comparisons.</p>
 <p><strong>Question:</strong> Are any olfactory receptor genes (starting with “Olfr”) among the top hits? Hint: <code>filter(str_starts(external_gene_name, &quot;Olfr&quot;))</code></p>
 </blockquote>
-</section>
-<section id="heatmap-of-top-de-genes" class="level2">
-<h2 class="anchored" data-anchor-id="heatmap-of-top-de-genes">6.3 Heatmap of top DE genes</h2>
-<div class="cell">
-<details open class="code-fold">
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Select the top 50 DE genes across all comparisons</span></span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Hint: bind_rows() the three result tables, filter significant genes,</span></span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="co"># arrange by padj, pull ensembl_gene_id, unique(), head(50)</span></span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>top_genes_all <span class="ot">&lt;-</span> ...</span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract normalised counts for these genes</span></span>
-<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Hint: counts(dds_all, normalized = TRUE)</span></span>
-<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>norm_counts <span class="ot">&lt;-</span> ...</span>
-<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>top_counts  <span class="ot">&lt;-</span> norm_counts[<span class="fu">rownames</span>(norm_counts) <span class="sc">%in%</span> top_genes_all, ]</span>
-<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Replace Ensembl IDs with gene symbols as row names</span></span>
-<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Hint: match() to align gene_info with rownames(top_counts)</span></span>
-<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a><span class="fu">rownames</span>(top_counts) <span class="ot">&lt;-</span> ...</span>
-<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot heatmap</span></span>
-<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a><span class="fu">pheatmap</span>(</span>
-<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">log2</span>(top_counts <span class="sc">+</span> <span class="dv">1</span>),</span>
-<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>  <span class="at">scale          =</span> <span class="st">&quot;row&quot;</span>,</span>
-<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a>  <span class="at">show_rownames  =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a>  <span class="at">annotation_col =</span> <span class="fu">data.frame</span>(<span class="at">zone =</span> coldata<span class="sc">$</span>zone, <span class="at">row.names =</span> <span class="fu">rownames</span>(coldata)),</span>
-<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a>  <span class="at">main           =</span> <span class="st">&quot;Top 50 DE genes&quot;</span></span>
-<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-</div>
-<blockquote class="blockquote">
-<p><strong>Question:</strong> Do you see clear zone-specific expression patterns? Which genes are most specifically expressed in one zone?</p>
-</blockquote>
 <hr>
 </section>
 </section>
@@ -3581,27 +3551,27 @@ vertical-align: -.125em;
 <div class="cell">
 <details open class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get significantly upregulated genes in Zone 1 vs Zone 2</span></span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Hint: filter(padj &lt; 0.05, log2FoldChange &gt; 1) |&gt; pull(ensembl_gene_id)</span></span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>up_z1 <span class="ot">&lt;-</span> ...</span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Run GO enrichment using enrichGO() from clusterProfiler</span></span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="co"># OrgDb = org.Mm.eg.db (mouse annotation database)</span></span>
-<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="co"># keyType = &quot;ENSEMBL&quot;</span></span>
-<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a><span class="co"># ont = &quot;BP&quot; (Biological Process)</span></span>
-<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>ego_z1 <span class="ot">&lt;-</span> <span class="fu">enrichGO</span>(</span>
-<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">gene          =</span> up_z1,</span>
-<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">OrgDb         =</span> ...,</span>
-<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">keyType       =</span> ...,</span>
-<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">ont           =</span> ...,</span>
-<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">pAdjustMethod =</span> <span class="st">&quot;BH&quot;</span>,</span>
-<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">pvalueCutoff  =</span> <span class="fl">0.05</span>,</span>
-<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">readable      =</span> <span class="cn">TRUE</span></span>
-<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Visualise results</span></span>
-<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Hint: dotplot(ego_z1, showCategory = 20)</span></span>
-<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a><span class="fu">dotplot</span>(...)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get significantly upregulated genes in Zone 1 vs Zone 2</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Hint: filter(padj &lt; 0.05, log2FoldChange &gt; 1) |&gt; pull(ensembl_gene_id)</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>up_z1 <span class="ot">&lt;-</span> ...</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Run GO enrichment using enrichGO() from clusterProfiler</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="co"># OrgDb = org.Mm.eg.db (mouse annotation database)</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="co"># keyType = &quot;ENSEMBL&quot;</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a><span class="co"># ont = &quot;BP&quot; (Biological Process)</span></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>ego_z1 <span class="ot">&lt;-</span> <span class="fu">enrichGO</span>(</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">gene          =</span> up_z1,</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">OrgDb         =</span> ...,</span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">keyType       =</span> ...,</span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">ont           =</span> ...,</span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">pAdjustMethod =</span> <span class="st">&quot;BH&quot;</span>,</span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">pvalueCutoff  =</span> <span class="fl">0.05</span>,</span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">readable      =</span> <span class="cn">TRUE</span></span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Visualise results</span></span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Hint: dotplot(ego_z1, showCategory = 20)</span></span>
+<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a><span class="fu">dotplot</span>(...)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <blockquote class="blockquote">
@@ -3619,18 +3589,18 @@ vertical-align: -.125em;
 <div class="cell">
 <details open class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Save your DESeq2 results tables as CSV files</span></span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Hint: write_csv(res_z1_z2, here(&quot;analysis&quot;, &quot;exercises&quot;, &quot;results_zone1_vs_zone2.csv&quot;))</span></span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="fu">write_csv</span>(res_z1_z2, ...)</span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="fu">write_csv</span>(res_z1_z5, ...)</span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="fu">write_csv</span>(res_z2_z5, ...)</span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Save the DESeq2 object for use on Day 5</span></span>
-<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(dds_all, <span class="fu">here</span>(<span class="st">&quot;analysis&quot;</span>, <span class="st">&quot;exercises&quot;</span>, <span class="st">&quot;dds_all.rds&quot;</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Save your DESeq2 results tables as CSV files</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Hint: write_csv(res_z1_z2, here(&quot;analysis&quot;, &quot;exercises&quot;, &quot;results_zone1_vs_zone2.csv&quot;))</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="fu">write_csv</span>(res_z1_z2, ...)</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="fu">write_csv</span>(res_z1_z5, ...)</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="fu">write_csv</span>(res_z2_z5, ...)</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Save the DESeq2 object for use on Day 5</span></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(dds_all, <span class="fu">here</span>(<span class="st">&quot;analysis&quot;</span>, <span class="st">&quot;exercises&quot;</span>, <span class="st">&quot;dds_all.rds&quot;</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <hr>
-<p><em>Lisa Korneeva — Boulard Lab, EMBL Heidelberg</em></p>
+<p><em>By Lisa Korneeva with some help of Claude Sonnet 4.6</em></p>
 </section>
 
 </main>

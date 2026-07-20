@@ -53,7 +53,7 @@ library(biomaRt)
 
 ## 1.2 Define paths
 
-Use `here()` to define the path to your count files. The `ReadsPerGene.out.tab` files are located in the `results/alignments/star/_shared/` directory of the pipeline output.
+Use `here()` to define the path to your count files. The `ReadsPerGene.out.tab` files are located in the `/home/YOUR_USER/multimodal-ngs-course-2026/pipelines/rna-seq-zone-specific-3t-seq/solutions/results/alignments` directory of the pipeline output.
 
 ```{r}
 # Define path to count files using here()
@@ -105,7 +105,7 @@ count_list <- lapply(count_files, function(f) {
 count_matrix <- ...
 colnames(count_matrix) <- names(count_files)
 
-# Check dimensions — should be ~55450 genes x 8 samples
+# Check dimensions 
 dim(count_matrix)
 head(count_matrix)
 ```
@@ -247,7 +247,7 @@ pheatmap(
 ```{r}
 # Extract results for Zone 1 vs Zone 2
 # Hint: results(dds_all, contrast = c("zone", "zone1", "zone2"), alpha = 0.05)
-# Apply LFC shrinkage with lfcShrink(..., type = "ashr")
+# Apply LFC shrinkage with lfcShrink(..., type = "apeglm")
 res_z1_z2 <- ...
 
 # Convert to data frame, add gene symbols from gene_info
@@ -320,6 +320,7 @@ res_z1_z2 |>
 ## 6.2 Volcano plot
 
 A volcano plot shows:
+
 - **X-axis:** log2 fold change (effect size)
 - **Y-axis:** -log10 adjusted p-value (significance)
 
@@ -348,35 +349,6 @@ res_z1_z2 |>
 >
 > **Question:** Are any olfactory receptor genes (starting with "Olfr") among the top hits?
 > Hint: `filter(str_starts(external_gene_name, "Olfr"))`
-
-## 6.3 Heatmap of top DE genes
-
-```{r}
-# Select the top 50 DE genes across all comparisons
-# Hint: bind_rows() the three result tables, filter significant genes,
-# arrange by padj, pull ensembl_gene_id, unique(), head(50)
-top_genes_all <- ...
-
-# Extract normalised counts for these genes
-# Hint: counts(dds_all, normalized = TRUE)
-norm_counts <- ...
-top_counts  <- norm_counts[rownames(norm_counts) %in% top_genes_all, ]
-
-# Replace Ensembl IDs with gene symbols as row names
-# Hint: match() to align gene_info with rownames(top_counts)
-rownames(top_counts) <- ...
-
-# Plot heatmap
-pheatmap(
-  log2(top_counts + 1),
-  scale          = "row",
-  show_rownames  = TRUE,
-  annotation_col = data.frame(zone = coldata$zone, row.names = rownames(coldata)),
-  main           = "Top 50 DE genes"
-)
-```
-
-> **Question:** Do you see clear zone-specific expression patterns? Which genes are most specifically expressed in one zone?
 
 ---
 
@@ -431,4 +403,4 @@ saveRDS(dds_all, here("analysis", "exercises", "dds_all.rds"))
 
 ---
 
-*Lisa Korneeva — Boulard Lab, EMBL Heidelberg*
+*By Lisa Korneeva with some help of Claude Sonnet 4.6*
