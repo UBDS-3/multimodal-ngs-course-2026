@@ -1,0 +1,112 @@
+name: Single copy genes DESeq2
+datasets:
+  results:
+    path: /g/boulard/Lisa/Projects/multimodal-ngs-ubds-2026/pipelines/rna-seq-zone-specific-3t-seq/3t-seq/results/analysis/tables/deseq2/zone1_vs_zone5/results.csv
+    offer-excel: true
+  results.shrink:
+    path: /g/boulard/Lisa/Projects/multimodal-ngs-ubds-2026/pipelines/rna-seq-zone-specific-3t-seq/3t-seq/results/analysis/tables/deseq2/zone1_vs_zone5/results.shrink.csv
+    offer-excel: true
+webview-controls: false
+default-view: results
+max-in-memory-rows: 29203
+views:
+  results:
+    dataset: results
+    desc: '# Results table from DESeq2 analysis
+
+      '
+    page-size: 25
+    render-table:
+      columns:
+        index(0):
+          display-mode: hidden
+        gene_id:
+          display-mode: detail
+          optional: true
+        log2FoldChange:
+          label: Log2 fold change
+          precision: 1
+        padj:
+          label: Adjusted p-value
+          precision: 4
+          plot:
+            bars:
+              scale: linear
+              domain:
+              - 0
+              - 1
+        pvalue:
+          label: P-value
+          precision: 4
+        baseMean:
+          label: Mean expression
+          precision: 1
+        gene_name:
+          label: Gene name
+        lfcSE:
+          label: Log2 fold change error
+          optional: true
+          display-mode: detail
+        stat:
+          display-mode: detail
+          label: Statistics value
+          optional: true
+  results.shrink:
+    dataset: results.shrink
+    desc: '# Results table from DESeq2 analysis
+
+      '
+    page-size: 25
+    render-table:
+      columns:
+        index(0):
+          display-mode: hidden
+        gene_id:
+          display-mode: detail
+          optional: true
+        log2FoldChange:
+          label: Log2 fold change
+          precision: 1
+        padj:
+          label: Adjusted p-value
+          precision: 4
+          plot:
+            bars:
+              scale: linear
+              domain:
+              - 0
+              - 1
+        pvalue:
+          label: P-value
+          precision: 4
+        baseMean:
+          label: Mean expression
+          precision: 1
+        gene_name:
+          label: Gene name
+        lfcSE:
+          label: Log2 fold change error
+          optional: true
+          display-mode: detail
+        stat:
+          display-mode: detail
+          label: Statistics value
+          optional: true
+  results-volcano-ma-plot:
+    dataset: results
+    desc: '# Volcano and MA plots
+
+      Use the control below to customize the plot
+
+      '
+    render-plot:
+      spec-path: /g/boulard/Lisa/Projects/multimodal-ngs-ubds-2026/pipelines/rna-seq-zone-specific-3t-seq/3t-seq/workflow/datavzrd/volcano-ma-plot.json
+  results.shrink-volcano-ma-plot:
+    dataset: results.shrink
+    desc: '# Volcano and MA plots
+
+      Use the control below to customize the plot
+
+      '
+    render-plot:
+      spec-path: /g/boulard/Lisa/Projects/multimodal-ngs-ubds-2026/pipelines/rna-seq-zone-specific-3t-seq/3t-seq/workflow/datavzrd/volcano-ma-plot.json

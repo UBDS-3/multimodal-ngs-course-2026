@@ -1,0 +1,6 @@
+Sample	input_read_pairs	surviving	surviving_pct	forward_only_surviving	forward_only_surviving_pct	reverse_only_surviving	reverse_only_surviving_pct	dropped	dropped_pct
+g | boulard | Lisa | Projects | multimodal-ngs-ubds-2026 | pipelines | rna-seq-zone-specific-3t-seq | 3t-seq | results | trim | zone1_vs_zone2 | RNA_Zone1_mOSN_Rep1	26658688.0	24959737.0	93.63	547467.0	2.05	7608.0	0.03	1143876.0	4.29
+g | boulard | Lisa | Projects | multimodal-ngs-ubds-2026 | pipelines | rna-seq-zone-specific-3t-seq | 3t-seq | results | trim | zone1_vs_zone2 | RNA_Zone1_mOSN_Rep2	35948921.0	33654231.0	93.62	940542.0	2.62	9954.0	0.03	1344194.0	3.74
+g | boulard | Lisa | Projects | multimodal-ngs-ubds-2026 | pipelines | rna-seq-zone-specific-3t-seq | 3t-seq | results | trim | zone1_vs_zone2 | RNA_Zone1_mOSN_Rep3	49512451.0	48367554.0	97.69	1004447.0	2.03	104694.0	0.21	35756.0	0.07
+g | boulard | Lisa | Projects | multimodal-ngs-ubds-2026 | pipelines | rna-seq-zone-specific-3t-seq | 3t-seq | results | trim | zone1_vs_zone2 | RNA_Zone2_mOSN_Rep1	53283947.0	51947300.0	97.49	1183331.0	2.22	117567.0	0.22	35749.0	0.07
+g | boulard | Lisa | Projects | multimodal-ngs-ubds-2026 | pipelines | rna-seq-zone-specific-3t-seq | 3t-seq | results | trim | zone1_vs_zone2 | RNA_Zone2_mOSN_Rep2	69841865.0	68192131.0	97.64	1432881.0	2.05	158991.0	0.23	57862.0	0.08

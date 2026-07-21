@@ -1,0 +1,11 @@
+Sample	Unique Reads	Duplicate Reads
+g | boulard | Lisa | Projects | multimodal-ngs-ubds-2026 | pipelines | rna-seq-zone-specific-3t-seq | 3t-seq | results | qc | fastqc-raw | zone1_vs_zone2 | RNA_Zone1_mOSN_Rep1_1	12602706.0	14055982.0
+g | boulard | Lisa | Projects | multimodal-ngs-ubds-2026 | pipelines | rna-seq-zone-specific-3t-seq | 3t-seq | results | qc | fastqc-raw | zone1_vs_zone2 | RNA_Zone1_mOSN_Rep1_2	11398671.0	15260017.0
+g | boulard | Lisa | Projects | multimodal-ngs-ubds-2026 | pipelines | rna-seq-zone-specific-3t-seq | 3t-seq | results | qc | fastqc-raw | zone1_vs_zone2 | RNA_Zone1_mOSN_Rep2_1	19472102.0	16476819.0
+g | boulard | Lisa | Projects | multimodal-ngs-ubds-2026 | pipelines | rna-seq-zone-specific-3t-seq | 3t-seq | results | qc | fastqc-raw | zone1_vs_zone2 | RNA_Zone1_mOSN_Rep2_2	17725869.0	18223052.0
+g | boulard | Lisa | Projects | multimodal-ngs-ubds-2026 | pipelines | rna-seq-zone-specific-3t-seq | 3t-seq | results | qc | fastqc-raw | zone1_vs_zone2 | RNA_Zone1_mOSN_Rep3_1	32467778.0	17044673.0
+g | boulard | Lisa | Projects | multimodal-ngs-ubds-2026 | pipelines | rna-seq-zone-specific-3t-seq | 3t-seq | results | qc | fastqc-raw | zone1_vs_zone2 | RNA_Zone1_mOSN_Rep3_2	30566986.0	18945465.0
+g | boulard | Lisa | Projects | multimodal-ngs-ubds-2026 | pipelines | rna-seq-zone-specific-3t-seq | 3t-seq | results | qc | fastqc-raw | zone1_vs_zone2 | RNA_Zone2_mOSN_Rep1_1	34296891.0	18987056.0
+g | boulard | Lisa | Projects | multimodal-ngs-ubds-2026 | pipelines | rna-seq-zone-specific-3t-seq | 3t-seq | results | qc | fastqc-raw | zone1_vs_zone2 | RNA_Zone2_mOSN_Rep1_2	31864435.0	21419512.0
+g | boulard | Lisa | Projects | multimodal-ngs-ubds-2026 | pipelines | rna-seq-zone-specific-3t-seq | 3t-seq | results | qc | fastqc-raw | zone1_vs_zone2 | RNA_Zone2_mOSN_Rep2_1	28846653.0	40995212.0
+g | boulard | Lisa | Projects | multimodal-ngs-ubds-2026 | pipelines | rna-seq-zone-specific-3t-seq | 3t-seq | results | qc | fastqc-raw | zone1_vs_zone2 | RNA_Zone2_mOSN_Rep2_2	29297694.0	40544171.0

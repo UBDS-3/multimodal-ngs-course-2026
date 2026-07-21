@@ -1,0 +1,6 @@
+Sample	Unique Pairs	Unique Unpaired	Duplicate Pairs Nonoptical	Duplicate Unpaired	Unmapped
+g | boulard | Lisa | Projects | multimodal-ngs-ubds-2026 | pipelines | rna-seq-zone-specific-3t-seq | 3t-seq | results | alignments | star_markdup | zone1_vs_zone2 | RNA_Zone1_mOSN_Rep1	31020568.0	0.0	17460460.0	0.0	1438446.0
+g | boulard | Lisa | Projects | multimodal-ngs-ubds-2026 | pipelines | rna-seq-zone-specific-3t-seq | 3t-seq | results | alignments | star_markdup | zone1_vs_zone2 | RNA_Zone1_mOSN_Rep2	44003646.0	0.0	21360748.0	0.0	1944068.0
+g | boulard | Lisa | Projects | multimodal-ngs-ubds-2026 | pipelines | rna-seq-zone-specific-3t-seq | 3t-seq | results | alignments | star_markdup | zone1_vs_zone2 | RNA_Zone1_mOSN_Rep3	73171574.0	1.0	20280356.0	5.0	3283172.0
+g | boulard | Lisa | Projects | multimodal-ngs-ubds-2026 | pipelines | rna-seq-zone-specific-3t-seq | 3t-seq | results | alignments | star_markdup | zone1_vs_zone2 | RNA_Zone2_mOSN_Rep1	75576588.0	1.0	25049664.0	1.0	3268346.0
+g | boulard | Lisa | Projects | multimodal-ngs-ubds-2026 | pipelines | rna-seq-zone-specific-3t-seq | 3t-seq | results | alignments | star_markdup | zone1_vs_zone2 | RNA_Zone2_mOSN_Rep2	43845958.0	11.0	84468748.0	47.0	8069498.0

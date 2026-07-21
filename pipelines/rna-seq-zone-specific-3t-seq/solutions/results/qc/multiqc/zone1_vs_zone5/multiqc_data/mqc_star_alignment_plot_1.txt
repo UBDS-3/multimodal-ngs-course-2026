@@ -1,0 +1,7 @@
+Sample	Uniquely mapped	Mapped to multiple loci	Mapped to too many loci	Unmapped: too short	Unmapped: other
+g | boulard | Lisa | Projects | multimodal-ngs-ubds-2026 | pipelines | rna-seq-zone-specific-3t-seq | 3t-seq | results | alignments | star | zone1_vs_zone5 | RNA_Zone1_mOSN_Rep1	22430950.0	1809564.0	76093.0	555544.0	87586.0
+g | boulard | Lisa | Projects | multimodal-ngs-ubds-2026 | pipelines | rna-seq-zone-specific-3t-seq | 3t-seq | results | alignments | star | zone1_vs_zone5 | RNA_Zone1_mOSN_Rep2	30665964.0	2016233.0	114912.0	652085.0	205037.0
+g | boulard | Lisa | Projects | multimodal-ngs-ubds-2026 | pipelines | rna-seq-zone-specific-3t-seq | 3t-seq | results | alignments | star | zone1_vs_zone5 | RNA_Zone1_mOSN_Rep3	44319219.0	2406752.0	119015.0	1271223.0	251345.0
+g | boulard | Lisa | Projects | multimodal-ngs-ubds-2026 | pipelines | rna-seq-zone-specific-3t-seq | 3t-seq | results | alignments | star | zone1_vs_zone5 | RNA_Zone5_mOSN_Rep1	28157618.0	2319847.0	85477.0	716860.0	110044.0
+g | boulard | Lisa | Projects | multimodal-ngs-ubds-2026 | pipelines | rna-seq-zone-specific-3t-seq | 3t-seq | results | alignments | star | zone1_vs_zone5 | RNA_Zone5_mOSN_Rep2	27561631.0	1679693.0	116154.0	1204487.0	190993.0
+g | boulard | Lisa | Projects | multimodal-ngs-ubds-2026 | pipelines | rna-seq-zone-specific-3t-seq | 3t-seq | results | alignments | star | zone1_vs_zone5 | RNA_Zone5_mOSN_Rep3	47080423.0	2071601.0	103942.0	1191303.0	228122.0

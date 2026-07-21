@@ -1,0 +1,13 @@
+	36	37	38	39	40	41	42	43	44	45	46	47	48	49	50
+g | boulard | Lisa | Projects | multimodal-ngs-ubds-2026 | pipelines | rna-seq-zone-specific-3t-seq | 3t-seq | results | qc | fastqc-markdup | zone1_vs_zone5 | RNA_Zone1_mOSN_Rep1	692.0	421.0	383.0	63.0	29.0	181.0	44.0	1453.0	92.0	368.0	275.0	249.0	409.0	16080.0	55933807.0
+	36	37	38	39	40	41	42	43	44	45	46	47	48	49	50
+g | boulard | Lisa | Projects | multimodal-ngs-ubds-2026 | pipelines | rna-seq-zone-specific-3t-seq | 3t-seq | results | qc | fastqc-markdup | zone1_vs_zone5 | RNA_Zone1_mOSN_Rep2	140.0	67.0	130.0	189.0	247.0	814.0	557.0	1606.0	251.0	12.0	1.0	19.0	1.0	82794.0	73673482.0
+	36	37	38	39	40	41	42	43	44	45	46	47	48	49	50	51	52	53	54	55	56	57	58	59	60	61	62	63	64	65	66	67	68	69	70	71	72	73	74	75
+g | boulard | Lisa | Projects | multimodal-ngs-ubds-2026 | pipelines | rna-seq-zone-specific-3t-seq | 3t-seq | results | qc | fastqc-markdup | zone1_vs_zone5 | RNA_Zone1_mOSN_Rep3	21.0	0.0	48.0	398.0	123.0	177.0	99.0	242.0	193.0	14.0	569.0	307.0	489.0	780.0	1182.0	689.0	562.0	212.0	653.0	578.0	1094.0	452.0	988.0	67.0	900.0	325.0	866.0	1051.0	1748.0	5627.0	2018.0	8132.0	17314.0	54979.0	136580.0	781023.0	2429317.0	7379699.0	24176376.0	69323851.0
+	36	37	38	39	40	41	42	43	44	45	46	47	48	49	50
+g | boulard | Lisa | Projects | multimodal-ngs-ubds-2026 | pipelines | rna-seq-zone-specific-3t-seq | 3t-seq | results | qc | fastqc-markdup | zone1_vs_zone5 | RNA_Zone5_mOSN_Rep1	865.0	498.0	546.0	111.0	44.0	245.0	76.0	1721.0	112.0	477.0	397.0	298.0	536.0	20314.0	70749854.0
+	36	37	38	39	40	41	42	43	44	45	46	47	48	49	50
+g | boulard | Lisa | Projects | multimodal-ngs-ubds-2026 | pipelines | rna-seq-zone-specific-3t-seq | 3t-seq | results | qc | fastqc-markdup | zone1_vs_zone5 | RNA_Zone5_mOSN_Rep2	132.0	34.0	116.0	174.0	200.0	720.0	465.0	1610.0	191.0	16.0	0.0	20.0	3.0	74833.0	67293172.0
+	36	37	38	39	40	41	42	43	44	45	46	47	48	49	50	51	52	53	54	55	56	57	58	59	60	61	62	63	64	65	66	67	68	69	70	71	72	73	74	75
+g | boulard | Lisa | Projects | multimodal-ngs-ubds-2026 | pipelines | rna-seq-zone-specific-3t-seq | 3t-seq | results | qc | fastqc-markdup | zone1_vs_zone5 | RNA_Zone5_mOSN_Rep3	19.0	0.0	39.0	412.0	144.0	192.0	107.0	279.0	179.0	17.0	520.0	335.0	525.0	772.0	1176.0	705.0	622.0	204.0	672.0	573.0	1161.0	488.0	1056.0	65.0	876.0	333.0	915.0	1146.0	2018.0	6009.0	2223.0	9049.0	18831.0	58429.0	146246.0	752622.0	2542206.0	7754435.0	25004128.0	71555176.0
+

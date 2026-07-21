@@ -1,0 +1,25 @@
+	49	50
+g | boulard | Lisa | Projects | multimodal-ngs-ubds-2026 | pipelines | rna-seq-zone-specific-3t-seq | 3t-seq | results | qc | fastqc-trimmed | zone1_vs_zone5 | RNA_Zone1_mOSN_Rep1_1	11438.0	24948299.0
+	36	37	38	39	40	41	42	43	44	45	46	47	48	49	50
+g | boulard | Lisa | Projects | multimodal-ngs-ubds-2026 | pipelines | rna-seq-zone-specific-3t-seq | 3t-seq | results | qc | fastqc-trimmed | zone1_vs_zone5 | RNA_Zone1_mOSN_Rep1_2	629.0	370.0	353.0	59.0	26.0	157.0	43.0	1275.0	82.0	320.0	255.0	218.0	369.0	2903.0	24952678.0
+	36	37	38	39	40	41	42	43	44	45	46	47	48	49	50
+g | boulard | Lisa | Projects | multimodal-ngs-ubds-2026 | pipelines | rna-seq-zone-specific-3t-seq | 3t-seq | results | qc | fastqc-trimmed | zone1_vs_zone5 | RNA_Zone1_mOSN_Rep2_1	136.0	60.0	122.0	181.0	221.0	741.0	506.0	1481.0	230.0	11.0	1.0	19.0	1.0	75761.0	33574760.0
+	50
+g | boulard | Lisa | Projects | multimodal-ngs-ubds-2026 | pipelines | rna-seq-zone-specific-3t-seq | 3t-seq | results | qc | fastqc-trimmed | zone1_vs_zone5 | RNA_Zone1_mOSN_Rep2_2	33654231.0
+	44	45	46	47	48	49	50	51	52	53	54	55	56	57	58	59	60	61	62	63	64	65	66	67	68	69	70	71	72	73	74	75
+g | boulard | Lisa | Projects | multimodal-ngs-ubds-2026 | pipelines | rna-seq-zone-specific-3t-seq | 3t-seq | results | qc | fastqc-trimmed | zone1_vs_zone5 | RNA_Zone1_mOSN_Rep3_1	1.0	0.0	0.0	75.0	19.0	1.0	2.0	0.0	2.0	0.0	7.0	0.0	3.0	0.0	0.0	0.0	6.0	13.0	26.0	228.0	826.0	2581.0	733.0	2885.0	7821.0	25344.0	64753.0	377761.0	1159177.0	3392058.0	10940923.0	32392309.0
+	36	37	38	39	40	41	42	43	44	45	46	47	48	49	50	51	52	53	54	55	56	57	58	59	60	61	62	63	64	65	66	67	68	69	70	71	72	73	74	75
+g | boulard | Lisa | Projects | multimodal-ngs-ubds-2026 | pipelines | rna-seq-zone-specific-3t-seq | 3t-seq | results | qc | fastqc-trimmed | zone1_vs_zone5 | RNA_Zone1_mOSN_Rep3_2	21.0	0.0	47.0	398.0	123.0	174.0	97.0	240.0	187.0	13.0	532.0	221.0	447.0	739.0	1131.0	680.0	556.0	206.0	642.0	571.0	1015.0	435.0	952.0	67.0	813.0	303.0	800.0	754.0	790.0	2700.0	1081.0	4661.0	8796.0	27259.0	67303.0	282838.0	1122202.0	3587189.0	11384896.0	31865675.0
+	49	50
+g | boulard | Lisa | Projects | multimodal-ngs-ubds-2026 | pipelines | rna-seq-zone-specific-3t-seq | 3t-seq | results | qc | fastqc-trimmed | zone1_vs_zone5 | RNA_Zone5_mOSN_Rep1_1	14279.0	31375567.0
+	36	37	38	39	40	41	42	43	44	45	46	47	48	49	50
+g | boulard | Lisa | Projects | multimodal-ngs-ubds-2026 | pipelines | rna-seq-zone-specific-3t-seq | 3t-seq | results | qc | fastqc-trimmed | zone1_vs_zone5 | RNA_Zone5_mOSN_Rep1_2	729.0	439.0	476.0	91.0	38.0	212.0	69.0	1511.0	99.0	419.0	353.0	264.0	459.0	3672.0	31381015.0
+	36	37	38	39	40	41	42	43	44	45	46	47	48	49	50
+g | boulard | Lisa | Projects | multimodal-ngs-ubds-2026 | pipelines | rna-seq-zone-specific-3t-seq | 3t-seq | results | qc | fastqc-trimmed | zone1_vs_zone5 | RNA_Zone5_mOSN_Rep2_1	116.0	33.0	106.0	157.0	179.0	660.0	407.0	1467.0	186.0	15.0	0.0	19.0	3.0	68196.0	30681414.0
+	50
+g | boulard | Lisa | Projects | multimodal-ngs-ubds-2026 | pipelines | rna-seq-zone-specific-3t-seq | 3t-seq | results | qc | fastqc-trimmed | zone1_vs_zone5 | RNA_Zone5_mOSN_Rep2_2	30752958.0
+	44	45	46	47	48	49	50	51	52	53	54	55	56	57	58	59	60	61	62	63	64	65	66	67	68	69	70	71	72	73	74	75
+g | boulard | Lisa | Projects | multimodal-ngs-ubds-2026 | pipelines | rna-seq-zone-specific-3t-seq | 3t-seq | results | qc | fastqc-trimmed | zone1_vs_zone5 | RNA_Zone5_mOSN_Rep3_1	2.0	0.0	0.0	94.0	22.0	0.0	0.0	0.0	7.0	0.0	3.0	0.0	8.0	0.0	0.0	0.0	1.0	13.0	45.0	246.0	953.0	2816.0	805.0	3209.0	8414.0	26753.0	70100.0	365813.0	1212093.0	3584898.0	11533682.0	33865414.0
+	36	37	38	39	40	41	42	43	44	45	46	47	48	49	50	51	52	53	54	55	56	57	58	59	60	61	62	63	64	65	66	67	68	69	70	71	72	73	74	75
+g | boulard | Lisa | Projects | multimodal-ngs-ubds-2026 | pipelines | rna-seq-zone-specific-3t-seq | 3t-seq | results | qc | fastqc-trimmed | zone1_vs_zone5 | RNA_Zone5_mOSN_Rep3_2	19.0	0.0	37.0	412.0	144.0	191.0	103.0	273.0	170.0	15.0	509.0	228.0	475.0	738.0	1137.0	703.0	601.0	203.0	661.0	561.0	1092.0	462.0	1012.0	64.0	830.0	318.0	851.0	810.0	872.0	2820.0	1197.0	5149.0	9468.0	28669.0	70882.0	296373.0	1192460.0	3789632.0	11893548.0	33371702.0
+

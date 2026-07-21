@@ -1,0 +1,21 @@
+	49	50
+g | boulard | Lisa | Projects | multimodal-ngs-ubds-2026 | pipelines | rna-seq-zone-specific-3t-seq | 3t-seq | results | qc | fastqc-trimmed | zone1_vs_zone2 | RNA_Zone1_mOSN_Rep1_1	11438.0	24948299.0
+	36	37	38	39	40	41	42	43	44	45	46	47	48	49	50
+g | boulard | Lisa | Projects | multimodal-ngs-ubds-2026 | pipelines | rna-seq-zone-specific-3t-seq | 3t-seq | results | qc | fastqc-trimmed | zone1_vs_zone2 | RNA_Zone1_mOSN_Rep1_2	629.0	370.0	353.0	59.0	26.0	157.0	43.0	1275.0	82.0	320.0	255.0	218.0	369.0	2903.0	24952678.0
+	36	37	38	39	40	41	42	43	44	45	46	47	48	49	50
+g | boulard | Lisa | Projects | multimodal-ngs-ubds-2026 | pipelines | rna-seq-zone-specific-3t-seq | 3t-seq | results | qc | fastqc-trimmed | zone1_vs_zone2 | RNA_Zone1_mOSN_Rep2_1	136.0	60.0	122.0	181.0	221.0	741.0	506.0	1481.0	230.0	11.0	1.0	19.0	1.0	75761.0	33574760.0
+	50
+g | boulard | Lisa | Projects | multimodal-ngs-ubds-2026 | pipelines | rna-seq-zone-specific-3t-seq | 3t-seq | results | qc | fastqc-trimmed | zone1_vs_zone2 | RNA_Zone1_mOSN_Rep2_2	33654231.0
+	44	45	46	47	48	49	50	51	52	53	54	55	56	57	58	59	60	61	62	63	64	65	66	67	68	69	70	71	72	73	74	75
+g | boulard | Lisa | Projects | multimodal-ngs-ubds-2026 | pipelines | rna-seq-zone-specific-3t-seq | 3t-seq | results | qc | fastqc-trimmed | zone1_vs_zone2 | RNA_Zone1_mOSN_Rep3_1	1.0	0.0	0.0	75.0	19.0	1.0	2.0	0.0	2.0	0.0	7.0	0.0	3.0	0.0	0.0	0.0	6.0	13.0	26.0	228.0	826.0	2581.0	733.0	2885.0	7821.0	25344.0	64753.0	377761.0	1159177.0	3392058.0	10940923.0	32392309.0
+	36	37	38	39	40	41	42	43	44	45	46	47	48	49	50	51	52	53	54	55	56	57	58	59	60	61	62	63	64	65	66	67	68	69	70	71	72	73	74	75
+g | boulard | Lisa | Projects | multimodal-ngs-ubds-2026 | pipelines | rna-seq-zone-specific-3t-seq | 3t-seq | results | qc | fastqc-trimmed | zone1_vs_zone2 | RNA_Zone1_mOSN_Rep3_2	21.0	0.0	47.0	398.0	123.0	174.0	97.0	240.0	187.0	13.0	532.0	221.0	447.0	739.0	1131.0	680.0	556.0	206.0	642.0	571.0	1015.0	435.0	952.0	67.0	813.0	303.0	800.0	754.0	790.0	2700.0	1081.0	4661.0	8796.0	27259.0	67303.0	282838.0	1122202.0	3587189.0	11384896.0	31865675.0
+	58	59	60	61	62	63	64	65	66	67	68	69	70	71	72	73	74	75
+g | boulard | Lisa | Projects | multimodal-ngs-ubds-2026 | pipelines | rna-seq-zone-specific-3t-seq | 3t-seq | results | qc | fastqc-trimmed | zone1_vs_zone2 | RNA_Zone2_mOSN_Rep1_1	2.0	0.0	4.0	13.0	63.0	249.0	934.0	3170.0	846.0	3553.0	9108.0	28100.0	71943.0	372091.0	1241238.0	3695983.0	11795571.0	34724432.0
+	36	37	38	39	40	41	42	43	44	45	46	47	48	49	50	51	52	53	54	55	56	57	58	59	60	61	62	63	64	65	66	67	68	69	70	71	72	73	74	75
+g | boulard | Lisa | Projects | multimodal-ngs-ubds-2026 | pipelines | rna-seq-zone-specific-3t-seq | 3t-seq | results | qc | fastqc-trimmed | zone1_vs_zone2 | RNA_Zone2_mOSN_Rep1_2	5.0	44.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	5.0	3.0	36.0	171.0	819.0	2978.0	712.0	3772.0	9535.0	29284.0	72416.0	305130.0	1219718.0	3887535.0	12173716.0	34241421.0
+	59	60	61	62	63	64	65	66	67	68	69	70	71	72	73	74	75
+g | boulard | Lisa | Projects | multimodal-ngs-ubds-2026 | pipelines | rna-seq-zone-specific-3t-seq | 3t-seq | results | qc | fastqc-trimmed | zone1_vs_zone2 | RNA_Zone2_mOSN_Rep2_1	9.0	16.0	9.0	53.0	295.0	1089.0	3376.0	1013.0	3835.0	10460.0	32995.0	84013.0	455328.0	1584872.0	4643576.0	15331617.0	46039575.0
+	36	37	38	39	40	41	42	43	44	45	46	47	48	49	50	51	52	53	54	55	56	57	58	59	60	61	62	63	64	65	66	67	68	69	70	71	72	73	74	75
+g | boulard | Lisa | Projects | multimodal-ngs-ubds-2026 | pipelines | rna-seq-zone-specific-3t-seq | 3t-seq | results | qc | fastqc-trimmed | zone1_vs_zone2 | RNA_Zone2_mOSN_Rep2_2	3974.0	1681.0	680.0	25.0	6.0	16.0	22.0	23.0	53.0	314.0	34.0	0.0	11.0	1093.0	1.0	4.0	7.0	0.0	175.0	3.0	32.0	13.0	57.0	49.0	105.0	111.0	222.0	413.0	1043.0	3946.0	1084.0	5206.0	12645.0	37476.0	90223.0	373927.0	1502616.0	5013777.0	16240878.0	44900186.0
+

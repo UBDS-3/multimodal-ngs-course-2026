@@ -1,0 +1,11 @@
+Sample	Unique Reads	Duplicate Reads
+g | boulard | Lisa | Projects | multimodal-ngs-ubds-2026 | pipelines | rna-seq-zone-specific-3t-seq | 3t-seq | results | qc | fastqc-trimmed | zone1_vs_zone2 | RNA_Zone1_mOSN_Rep1_1	11569761.0	13389976.0
+g | boulard | Lisa | Projects | multimodal-ngs-ubds-2026 | pipelines | rna-seq-zone-specific-3t-seq | 3t-seq | results | qc | fastqc-trimmed | zone1_vs_zone2 | RNA_Zone1_mOSN_Rep1_2	10085551.0	14874186.0
+g | boulard | Lisa | Projects | multimodal-ngs-ubds-2026 | pipelines | rna-seq-zone-specific-3t-seq | 3t-seq | results | qc | fastqc-trimmed | zone1_vs_zone2 | RNA_Zone1_mOSN_Rep2_1	18096951.0	15557280.0
+g | boulard | Lisa | Projects | multimodal-ngs-ubds-2026 | pipelines | rna-seq-zone-specific-3t-seq | 3t-seq | results | qc | fastqc-trimmed | zone1_vs_zone2 | RNA_Zone1_mOSN_Rep2_2	16122073.0	17532158.0
+g | boulard | Lisa | Projects | multimodal-ngs-ubds-2026 | pipelines | rna-seq-zone-specific-3t-seq | 3t-seq | results | qc | fastqc-trimmed | zone1_vs_zone2 | RNA_Zone1_mOSN_Rep3_1	31686911.0	16680643.0
+g | boulard | Lisa | Projects | multimodal-ngs-ubds-2026 | pipelines | rna-seq-zone-specific-3t-seq | 3t-seq | results | qc | fastqc-trimmed | zone1_vs_zone2 | RNA_Zone1_mOSN_Rep3_2	29506552.0	18861002.0
+g | boulard | Lisa | Projects | multimodal-ngs-ubds-2026 | pipelines | rna-seq-zone-specific-3t-seq | 3t-seq | results | qc | fastqc-trimmed | zone1_vs_zone2 | RNA_Zone2_mOSN_Rep1_1	33452964.0	18494336.0
+g | boulard | Lisa | Projects | multimodal-ngs-ubds-2026 | pipelines | rna-seq-zone-specific-3t-seq | 3t-seq | results | qc | fastqc-trimmed | zone1_vs_zone2 | RNA_Zone2_mOSN_Rep1_2	30634755.0	21312545.0
+g | boulard | Lisa | Projects | multimodal-ngs-ubds-2026 | pipelines | rna-seq-zone-specific-3t-seq | 3t-seq | results | qc | fastqc-trimmed | zone1_vs_zone2 | RNA_Zone2_mOSN_Rep2_1	28046896.0	40145235.0
+g | boulard | Lisa | Projects | multimodal-ngs-ubds-2026 | pipelines | rna-seq-zone-specific-3t-seq | 3t-seq | results | qc | fastqc-trimmed | zone1_vs_zone2 | RNA_Zone2_mOSN_Rep2_2	27750411.0	40441720.0
