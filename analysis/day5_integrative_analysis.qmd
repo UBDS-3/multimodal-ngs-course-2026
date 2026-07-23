@@ -1,0 +1,426 @@
+---
+title: "Multimodal NGS analysis of gene expression and chromatin state in olfactory epithelium"
+subtitle: "Day 5 - Integrative analysis of RNA-seq and ChIP-seq data - VIBE CODING WARNING"
+author: "Lisa Korneeva"
+date: today
+format:
+  html:
+    self-contained: true
+    toc: true
+    toc-location: left
+    toc-depth: 3
+    theme:
+      - flatly
+      - custom.scss
+    highlight-style: github
+    code-fold: show
+execute:
+  echo: true
+  eval: false
+  warning: false
+  message: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, eval = FALSE)
+```
+
+# Overview
+
+Welcome to Day 5 - the final day of the course! Today we bring together the two
+datasets we have analysed:
+
+- **RNA-seq**: zone-specific gene expression in mOSN
+- **ChIP-seq**: H3K9me3 signal across olfactory receptor loci
+
+The central biological question is: **does H3K9me3 enrichment correlate with
+silencing of olfactory receptor genes across zones?**
+
+We expect that in a given zone, the olfactory receptor genes that are *not*
+expressed should be marked by H3K9me3 (silenced heterochromatin), while the
+expressed OR genes should have lower H3K9me3 signal.
+
+---
+
+# 1. Setup
+
+## 1.1 Load libraries
+
+```{r}
+library(here)
+library(tidyverse)
+library(ggplot2)
+library(ggrepel)
+library(pheatmap)
+library(RColorBrewer)
+```
+
+## 1.2 Define paths
+
+```{r}
+# ChIP-seq results directory
+chipseq_dir <- here(
+  "pipelines",
+  "chip-seq-zone-specific-nextflow",
+  "solutions"
+)
+
+# RNA-seq results directory
+rnaseq_dir <- here(
+  "pipelines",
+  "rna-seq-zone-specific-3t-seq",
+  "solutions"
+)
+```
+
+---
+
+# 2. Load the data
+
+## 2.1 Load H3K9me3 signal
+
+The H3K9me3 signal table was computed with deepTools `multiBigwigSummary` over
+olfactory receptor gene bodies. Each row is a genomic region, each column is a
+sample.
+
+```{r}
+h3k9me3 <- read_tsv(
+  file.path(chipseq_dir, "h3k9me3_signal", "all_H3K9me3_signal_mm10.tab"),
+  col_names = TRUE
+)
+
+# Clean column names — remove quotes and file extensions
+colnames(h3k9me3) <- colnames(h3k9me3) |>
+  str_remove_all("'") |>
+  str_remove("\\.mLb\\.clN\\.bigWig")
+
+# Rename for clarity
+h3k9me3 <- h3k9me3 |>
+  rename(
+    chr   = `#chr`,
+    start = start,
+    end   = end,
+    Bulk  = ChIP_Bulk_mOSN_REP1,
+    Z1_R1 = ChIP_Zone1_mOSN_REP1,
+    Z1_R2 = ChIP_Zone1_mOSN_REP2,
+    Z2_R1 = ChIP_Zone2_mOSN_REP1,
+    Z2_R2 = ChIP_Zone2_mOSN_REP2,
+    Z5_R1 = ChIP_Zone5_mOSN_REP1,
+    Z5_R2 = ChIP_Zone5_mOSN_REP2
+  ) |>
+  mutate(
+    Zone1_signal = (Z1_R1 + Z1_R2) / 2,
+    Zone2_signal = (Z2_R1 + Z2_R2) / 2,
+    Zone5_signal = (Z5_R1 + Z5_R2) / 2
+  )
+
+dim(h3k9me3)
+head(h3k9me3)
+```
+
+## 2.2 Load olfactory receptor BED files
+
+```{r}
+# BED file columns: chr, start, end, gene_name, score, strand
+bed_cols <- c("chr", "start", "end", "gene_name", "score", "strand")
+
+or_zone1 <- read_tsv(
+  file.path(chipseq_dir, "or_bed", "OR_genes_zone1_mm10.bed"),
+  col_names = bed_cols
+)
+
+or_zone2 <- read_tsv(
+  file.path(chipseq_dir, "or_bed", "OR_genes_zone2_mm10.bed"),
+  col_names = bed_cols
+)
+
+or_zone5 <- read_tsv(
+  file.path(chipseq_dir, "or_bed", "OR_genes_zone5_mm10.bed"),
+  col_names = bed_cols
+)
+
+or_all <- read_tsv(
+  file.path(chipseq_dir, "or_bed", "OR_genes_zone_all_mm10.bed"),
+  col_names = bed_cols
+)
+
+# Add zone label
+or_zone1 <- or_zone1 |> mutate(expressed_zone = "Zone 1")
+or_zone2 <- or_zone2 |> mutate(expressed_zone = "Zone 2")
+or_zone5 <- or_zone5 |> mutate(expressed_zone = "Zone 5")
+
+# How many OR genes per zone?
+cat("Zone 1:", nrow(or_zone1), "OR genes\n")
+cat("Zone 2:", nrow(or_zone2), "OR genes\n")
+cat("Zone 5:", nrow(or_zone5), "OR genes\n")
+```
+
+## 2.3 Load RNA-seq DESeq2 results
+
+```{r}
+# Load DESeq2 object (all 8 samples, all three zones)
+dds_all <- readRDS(here("analysis", "solutions", "dds_all.rds"))
+
+# Load gene annotation
+gene_info <- readRDS(here("analysis", "solutions", "gene_info.rds"))
+
+# Load pairwise DESeq2 results tables
+res_z1_z2 <- read_csv(here("analysis", "solutions", "results_zone1_vs_zone2.csv"))
+res_z1_z5 <- read_csv(here("analysis", "solutions", "results_zone1_vs_zone5.csv"))
+res_z2_z5 <- read_csv(here("analysis", "solutions", "results_zone2_vs_zone5.csv"))
+
+# Quick check
+dds_all
+head(res_z1_z2)
+```
+
+---
+
+# 3. H3K9me3 Signal at Olfactory Receptor Loci
+
+## 3.1 Join H3K9me3 signal with OR gene coordinates
+
+The H3K9me3 signal table contains coordinates — we join it with the BED files
+by genomic position to assign signal values to specific OR genes.
+
+```{r}
+# Join H3K9me3 signal with OR gene coordinates by genomic position
+join_signal <- function(h3k9me3, or_bed) {
+  or_bed |>
+    left_join(h3k9me3, by = c("chr", "start", "end")) |>
+    filter(!is.na(Zone1_signal))
+}
+
+or_z1_signal <- join_signal(h3k9me3, or_zone1)
+or_z2_signal <- join_signal(h3k9me3, or_zone2)
+or_z5_signal <- join_signal(h3k9me3, or_zone5)
+
+# Combine all
+or_all_signal <- bind_rows(or_z1_signal, or_z2_signal, or_z5_signal)
+
+head(or_all_signal)
+```
+
+## 3.2 H3K9me3 signal by expressed zone
+
+Compare H3K9me3 levels in each zone for OR genes expressed in Zone 1, Zone 2, or Zone 5.
+
+```{r}
+# Reshape to long format for plotting
+or_signal_long <- or_all_signal |>
+  dplyr::select(gene_name, expressed_zone, Zone1_signal, Zone2_signal, Zone5_signal) |>
+  pivot_longer(
+    cols      = c(Zone1_signal, Zone2_signal, Zone5_signal),
+    names_to  = "measured_zone",
+    values_to = "h3k9me3_signal"
+  ) |>
+  mutate(
+    measured_zone = str_remove(measured_zone, "_signal") |>
+      str_replace("Zone", "Zone ")
+  )
+
+# Boxplot: H3K9me3 signal in each zone for different OR gene groups
+ggplot(or_signal_long,
+       aes(x     = measured_zone,
+           y     = h3k9me3_signal,
+           fill  = measured_zone)) +
+  geom_boxplot(outlier.size = 0.5, alpha = 0.8) +
+  geom_jitter(width = 0.1, size = 0.3, alpha = 0.3) +
+  facet_wrap(~ expressed_zone,
+             labeller = labeller(expressed_zone = function(x) paste("OR genes expressed in", x))) +
+  scale_fill_manual(values = c(
+    "Zone 1" = "#E41A1C",
+    "Zone 2" = "#377EB8",
+    "Zone 5" = "#4DAF4A"
+  )) +
+  theme_bw() +
+  labs(
+    title = "H3K9me3 signal at olfactory receptor loci",
+    x     = "Zone measured",
+    y     = "H3K9me3 signal",
+    fill  = "Zone"
+  ) +
+  theme(
+    plot.title      = element_text(hjust = 0.5),
+    legend.position = "none",
+    strip.text      = element_text(size = 9)
+  )
+```
+
+> **Question:** For OR genes expressed in Zone 1, what do you expect to see in Zone 2
+> and Zone 5? Does the plot support the hypothesis that H3K9me3 marks silent OR genes?
+
+---
+
+# 4. Correlating H3K9me3 with Gene Expression
+
+## 4.1 Prepare the joined dataset
+
+To correlate ChIP-seq signal with RNA-seq fold changes, we need to link genes
+between the two datasets. The OR BED files contain gene names (Olfr symbols),
+and the RNA-seq results contain Ensembl IDs — we use gene names to join them.
+
+```{r}
+# Join RNA-seq results with H3K9me3 signal for Zone 1 vs Zone 2
+# We look for OR genes that are DE between zones
+
+# Get OR gene names from all zones
+all_or_genes <- or_all |> pull(gene_name) |> unique()
+
+# Filter RNA-seq results to OR genes only
+res_or_z1_z2 <- res_z1_z2 |>
+  filter(external_gene_name %in% all_or_genes)
+
+res_or_z1_z5 <- res_z1_z5 |>
+  filter(external_gene_name %in% all_or_genes)
+
+res_or_z2_z5 <- res_z2_z5 |>
+  filter(external_gene_name %in% all_or_genes)
+
+
+cat("OR genes in zone1_vs_zone2 results:", nrow(res_or_z1_z2), "\n")
+cat("OR genes in zone1_vs_zone5 results:", nrow(res_or_z1_z5), "\n")
+cat("OR genes in zone2_vs_zone5 results:", nrow(res_or_z2_z5), "\n")
+```
+
+## 4.2 Scatter plot: log2FC vs H3K9me3 signal difference
+
+For Zone 1 vs Zone 2: genes upregulated in Zone 1 (positive log2FC) should show
+**lower** H3K9me3 in Zone 1 and **higher** H3K9me3 in Zone 2.
+
+```{r}
+# Compute H3K9me3 signal difference (Zone1 - Zone2) for OR genes
+h3k9me3_diff_z1z2 <- or_all_signal |>
+  dplyr::select(gene_name, Zone1_signal, Zone2_signal, Zone5_signal) |>
+  mutate(diff_z1_z2 = Zone1_signal - Zone2_signal,
+         diff_z1_z5 = Zone1_signal - Zone5_signal,
+         diff_z2_z5 = Zone2_signal - Zone5_signal)
+
+# Join with RNA-seq results
+cor_z1_z2 <- res_or_z1_z2 |>
+  left_join(h3k9me3_diff_z1z2, by = c("external_gene_name" = "gene_name")) |>
+  filter(!is.na(log2FoldChange), !is.na(diff_z1_z2))
+
+# Label top DE OR genes
+top_or <- cor_z1_z2 |>
+  filter(!is.na(padj)) |>
+  arrange(padj) |>
+  head(15)
+
+ggplot(cor_z1_z2,
+       aes(x = log2FoldChange,
+           y = diff_z1_z2)) +
+  geom_point(aes(colour = case_when(
+    !is.na(padj) & padj < 0.05 & log2FoldChange >  1 ~ "Up in Zone 1",
+    !is.na(padj) & padj < 0.05 & log2FoldChange < -1 ~ "Up in Zone 2",
+    TRUE ~ "Not significant"
+  )), alpha = 0.6, size = 1.5) +
+  geom_text_repel(
+    data         = top_or,
+    aes(label    = external_gene_name),
+    size         = 3,
+    max.overlaps = 15,
+    colour       = "black"
+  ) +
+  geom_hline(yintercept = 0, linetype = "dashed", colour = "grey50") +
+  geom_vline(xintercept = 0, linetype = "dashed", colour = "grey50") +
+  scale_colour_manual(values = c(
+    "Up in Zone 1"    = "#E41A1C",
+    "Up in Zone 2"    = "#377EB8",
+    "Not significant" = "grey70"
+  )) +
+  theme_bw() +
+  labs(
+    title   = "Zone 1 vs Zone 2: RNA-seq log2FC vs H3K9me3 signal difference",
+    x       = "Log2 fold change (RNA-seq)\nPositive = higher in Zone 1",
+    y       = "H3K9me3 signal difference (Zone1 - Zone2)\nPositive = more H3K9me3 in Zone 1",
+    colour  = NULL
+  ) +
+  theme(
+    plot.title      = element_text(hjust = 0.5, size = 11),
+    legend.position = "top"
+  )
+```
+
+> **Question:** What quadrant would you expect most Zone 1-expressed OR genes to
+> fall in? (Hint: if a gene is expressed in Zone 1 and silenced in Zone 2, what
+> happens to its RNA-seq fold change AND its H3K9me3 signal?)
+
+> **Exercise:** Repeat the scatter plot and correlation for Zone 1 vs Zone 5 and
+> Zone 2 vs Zone 5.
+
+---
+
+# 6. Zone-specific expression vs silencing
+
+## 6.1 Compare H3K9me3 in "own zone" vs "other zones"
+
+For each OR gene, compare H3K9me3 signal in its expressed zone vs the other zones.
+
+```{r}
+# For each OR gene, extract signal in "own zone" and "other zones"
+own_vs_other <- or_all_signal |>
+  mutate(
+    own_zone_signal = case_when(
+      expressed_zone == "Zone 1" ~ Zone1_signal,
+      expressed_zone == "Zone 2" ~ Zone2_signal,
+      expressed_zone == "Zone 5" ~ Zone5_signal
+    ),
+    other_zone_signal = case_when(
+      expressed_zone == "Zone 1" ~ (Zone2_signal + Zone5_signal) / 2,
+      expressed_zone == "Zone 2" ~ (Zone1_signal + Zone5_signal) / 2,
+      expressed_zone == "Zone 5" ~ (Zone1_signal + Zone2_signal) / 2
+    ),
+    signal_difference = other_zone_signal - own_zone_signal
+  )
+
+# Boxplot: own zone vs other zones
+own_vs_other |>
+  dplyr::select(gene_name, expressed_zone, own_zone_signal, other_zone_signal) |>
+  pivot_longer(
+    cols      = c(own_zone_signal, other_zone_signal),
+    names_to  = "signal_type",
+    values_to = "signal"
+  ) |>
+  mutate(signal_type = recode(signal_type,
+    "own_zone_signal"   = "Expressed zone",
+    "other_zone_signal" = "Silent zones (mean)"
+  )) |>
+  ggplot(aes(x = signal_type, y = signal, fill = signal_type)) +
+  geom_boxplot(outlier.size = 0.5, alpha = 0.8) +
+  geom_jitter(width = 0.1, size = 0.3, alpha = 0.3) +
+  facet_wrap(~ expressed_zone) +
+  scale_fill_manual(values = c(
+    "Expressed zone"       = "#66C2A5",
+    "Silent zones (mean)"  = "#FC8D62"
+  )) +
+  theme_bw() +
+  labs(
+    title = "H3K9me3 signal: expressed zone vs silent zones",
+    x     = NULL,
+    y     = "H3K9me3 signal",
+    fill  = NULL
+  ) +
+  theme(
+    plot.title      = element_text(hjust = 0.5),
+    legend.position = "top"
+  )
+```
+
+---
+
+# Biological Conclusions
+
+
+1. **Does H3K9me3 mark silent olfactory receptors?** Is the signal consistently
+   lower at OR genes in their expressed zone compared to silent zones?
+
+2. **Does the pattern hold for all zones equally?** Zone 5 has only 21 expressed
+   OR genes — does the smaller sample size affect your confidence in the results?
+
+3. **Limitations of this analysis:** What assumptions are we making? What
+   additional data would strengthen these conclusions?
+
+---
+
+*By Lisa Korneeva with some help of Claude Sonnet 4.6*
