@@ -1,0 +1,445 @@
+---
+title: "Multimodal NGS analysis of gene expression and chromatin state in olfactory epithelium"
+subtitle: "Day 3 — RNA-seq results — Solutions"
+author: "Lisa Korneeva"
+date: today
+format:
+  html:
+    self-contained: true
+    toc: true
+    toc-location: left
+    toc-depth: 3
+    theme:
+      - flatly
+      - custom.scss
+    highlight-style: github
+    code-fold: show
+execute:
+  echo: true
+  eval: false
+  warning: false
+  message: false
+---
+
+# Overview
+
+Today we explore the results of the RNA-seq pipeline. We will:
+
+- Load raw count data from STAR output
+- Construct a DESeq2 object and run differential expression analysis
+- Assess data quality with PCA and sample distance heatmaps
+- Visualise results with MA plots and volcano plots
+- Perform gene ontology enrichment analysis with clusterProfiler
+
+---
+
+# 1. Setup
+
+## 1.1 Load libraries
+
+```{r}
+library(here)
+library(DESeq2)
+library(tidyverse)
+library(ggplot2)
+library(ggrepel)
+library(pheatmap)
+library(clusterProfiler)
+library(org.Mm.eg.db)
+library(biomaRt)
+```
+
+## 1.2 Define paths
+
+```{r}
+# Set paths using here() — all paths relative to project root
+counts_dir <- here(
+  "pipelines",
+  "rna-seq-zone-specific-3t-seq",
+  "solutions",
+  "results",
+  "alignments"
+)
+
+# List all ReadsPerGene files
+count_files <- list.files(
+  counts_dir,
+  pattern     = "ReadsPerGene.out.tab",
+  recursive   = TRUE,
+  full.names  = TRUE
+)
+
+# Extract sample names from file paths
+sample_names <- basename(count_files) |>
+  str_remove("\\.ReadsPerGene\\.out\\.tab$")
+
+names(count_files) <- sample_names
+count_files
+```
+
+---
+
+# 2. Load and prepare count data
+
+## 2.1 Load ReadsPerGene files
+
+STAR's `ReadsPerGene.out.tab` has 4 columns:
+- Column 1: gene ID
+- Column 2: unstranded counts
+- Column 3: forward-stranded counts ← we use this (NuQuant kit)
+- Column 4: reverse-stranded counts
+
+The first 4 rows are summary statistics (N_unmapped, N_multimapping, etc.) — we skip these.
+
+```{r}
+# Load all count files and extract forward-stranded counts (column 3)
+count_list <- lapply(count_files, function(f) {
+  read.table(f, header = FALSE, skip = 4, row.names = 1)[, 2, drop = FALSE]
+})
+
+# Combine into one count matrix
+count_matrix <- do.call(cbind, count_list)
+colnames(count_matrix) <- names(count_files)
+
+dim(count_matrix)   # should be 55450 genes x 8 samples
+head(count_matrix)
+```
+
+## 2.2 Add gene symbols
+
+```{r}
+# Connect to Ensembl biomaRt for mouse
+mart <- useEnsembl(
+  biomart = "ensembl",
+  dataset = "mmusculus_gene_ensembl",
+  version = 105
+)
+
+gene_info <- getBM(
+  attributes = c("ensembl_gene_id", "external_gene_name", "gene_biotype"),
+  filters    = "ensembl_gene_id",
+  values     = rownames(count_matrix),
+  mart       = mart
+)
+
+# Check if Olfr names are there
+gene_info |> filter(grepl("^Olfr", external_gene_name)) |> head(10)
+
+head(gene_info)
+```
+
+## 2.3 Create sample metadata
+
+```{r}
+# Create colData — sample metadata for DESeq2
+coldata <- data.frame(
+  sample    = colnames(count_matrix),
+  zone      = factor(c("zone1", "zone1", "zone1",
+                       "zone2", "zone2",
+                       "zone5", "zone5", "zone5")),
+  replicate = c(1, 2, 3, 1, 2, 1, 2, 3)
+)
+rownames(coldata) <- coldata$sample
+coldata
+```
+
+---
+
+# 3. DESeq2 analysis
+
+## 3.1 Create DESeq2 object
+
+```{r}
+# Subset count matrix to samples in coldata (in case order differs)
+count_matrix_ordered <- count_matrix[, rownames(coldata)]
+
+# Create DESeqDataSet
+dds_all <- DESeqDataSetFromMatrix(
+  countData = count_matrix_ordered,
+  colData   = coldata,
+  design    = ~ zone
+)
+
+# Pre-filter: remove genes with very low counts
+keep <- rowSums(counts(dds_all) >= 10) >= 3
+dds_all <- dds_all[keep, ]
+nrow(dds_all)
+```
+
+## 3.2 Run DESeq2
+
+```{r}
+dds_all <- DESeq(dds_all)
+```
+
+---
+
+# 4. Quality control
+
+## 4.1 PCA
+
+```{r}
+# Variance stabilising transformation
+vsd <- vst(dds_all, blind = FALSE)
+
+# PCA
+pca_data <- plotPCA(vsd, intgroup = "zone", returnData = TRUE)
+percent_var <- round(100 * attr(pca_data, "percentVar"))
+
+ggplot(pca_data, aes(x = PC1, y = PC2, colour = zone, label = name)) +
+  geom_point(size = 4) +
+  geom_text_repel(size = 3) +
+  scale_colour_manual(values = c(
+    zone1 = "#E41A1C",
+    zone2 = "#377EB8",
+    zone5 = "#4DAF4A"
+  )) +
+  xlab(paste0("PC1: ", percent_var[1], "% variance")) +
+  ylab(paste0("PC2: ", percent_var[2], "% variance")) +
+  theme_bw() +
+  ggtitle("PCA — all samples") +
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+## 4.2 Sample distance heatmap
+
+```{r}
+# Sample-to-sample distances
+sampleDists     <- dist(t(assay(vsd)))
+sampleDistMatrix <- as.matrix(sampleDists)
+
+# Annotation for heatmap
+annotation_col <- data.frame(
+  zone = coldata$zone,
+  row.names = rownames(coldata)
+)
+
+pheatmap(
+  sampleDistMatrix,
+  clustering_distance_rows = sampleDists,
+  clustering_distance_cols = sampleDists,
+  annotation_col           = annotation_col,
+  main                     = "Sample-to-sample distances"
+)
+```
+
+---
+
+# 5. Pairwise comparisons
+
+## 5.1 Extract results for each comparison
+
+```{r}
+# Helper function to extract and annotate DESeq2 results
+get_results <- function(dds, contrast, gene_info) {
+  res <- results(dds, contrast = contrast, alpha = 0.05)
+  res <- lfcShrink(dds, contrast = contrast, res = res, type = "ashr")
+  res_df <- as.data.frame(res) |>
+    rownames_to_column("ensembl_gene_id") |>
+    left_join(gene_info, by = "ensembl_gene_id") |>
+    arrange(padj)
+  return(res_df)
+}
+
+# Zone 1 vs Zone 2
+res_z1_z2 <- get_results(
+  dds_all,
+  contrast  = c("zone", "zone1", "zone2"),
+  gene_info = gene_info
+)
+
+# Zone 1 vs Zone 5
+res_z1_z5 <- get_results(
+  dds_all,
+  contrast  = c("zone", "zone1", "zone5"),
+  gene_info = gene_info
+)
+
+# Zone 2 vs Zone 5
+res_z2_z5 <- get_results(
+  dds_all,
+  contrast  = c("zone", "zone2", "zone5"),
+  gene_info = gene_info
+)
+
+head(res_z2_z5)
+```
+
+## 5.2 Summary — how many genes are DE?
+
+```{r}
+# Count significant genes per comparison
+summarise_de <- function(res_df, name) {
+  sig <- res_df |> filter(!is.na(padj), padj < 0.05)
+  data.frame(
+    comparison   = name,
+    total_sig    = nrow(sig),
+    upregulated  = sum(sig$log2FoldChange > 1),
+    downregulated = sum(sig$log2FoldChange < -1)
+  )
+}
+
+de_summary <- bind_rows(
+  summarise_de(res_z1_z2, "Zone1 vs Zone2"),
+  summarise_de(res_z1_z5, "Zone1 vs Zone5"),
+  summarise_de(res_z2_z5, "Zone2 vs Zone5")
+)
+
+de_summary
+```
+
+---
+
+# 6. Visualisation
+
+## 6.1 MA plot
+
+An MA plot shows log2 fold change (M) vs mean expression (A). Significant genes are highlighted in red.
+
+```{r}
+plot_ma <- function(res_df, title) {
+  res_df |>
+    filter(!is.na(padj)) |>
+    mutate(significant = padj < 0.05 & abs(log2FoldChange) > 1) |>
+    ggplot(aes(x = log10(baseMean + 1),
+               y = log2FoldChange,
+               colour = significant)) +
+    geom_point(alpha = 0.4, size = 0.8) +
+    scale_colour_manual(values = c("FALSE" = "grey70", "TRUE" = "#E41A1C")) +
+    geom_hline(yintercept = 0, linetype = "dashed") +
+    geom_hline(yintercept = c(-1, 1), linetype = "dotted", colour = "grey40") +
+    theme_bw() +
+    labs(title  = title,
+         x      = "Log10 mean expression",
+         y      = "Log2 fold change",
+         colour = "Significant") +
+    theme(plot.title = element_text(hjust = 0.5),
+          legend.position = "top")
+}
+
+plot_ma(res_z1_z2, "MA plot — Zone 1 vs Zone 2")
+plot_ma(res_z1_z5, "MA plot — Zone 1 vs Zone 5")
+plot_ma(res_z2_z5, "MA plot — Zone 2 vs Zone 5")
+```
+
+## 6.2 Volcano plot
+
+```{r}
+plot_volcano <- function(res_df, title,
+                         lfc_threshold  = 1,
+                         padj_threshold = 0.05,
+                         n_labels       = 20) {
+
+  zones  <- strsplit(title, " vs ")[[1]]
+  up_lab <- paste("Up in", zones[1])
+  dn_lab <- paste("Up in", zones[2])
+
+  res_clean <- res_df |>
+    filter(!is.na(padj), !is.na(log2FoldChange)) |>
+    mutate(significance = case_when(
+      padj < padj_threshold & log2FoldChange >  lfc_threshold ~ up_lab,
+      padj < padj_threshold & log2FoldChange < -lfc_threshold ~ dn_lab,
+      TRUE ~ "Not significant"
+    ))
+
+  top_genes <- res_clean |>
+    filter(significance != "Not significant") |>
+    arrange(padj) |>
+    head(n_labels)
+
+  ggplot(res_clean,
+         aes(x = log2FoldChange,
+             y = -log10(padj),
+             colour = significance)) +
+    geom_point(alpha = 0.5, size = 0.8) +
+    geom_text_repel(
+      data         = top_genes,
+      aes(label    = external_gene_name),
+      size         = 3,
+      max.overlaps = 20,
+      colour       = "black"
+    ) +
+    scale_colour_manual(values = c(
+      setNames("#E41A1C", up_lab),
+      setNames("#377EB8", dn_lab),
+      "Not significant" = "grey70"
+    )) +
+    geom_vline(xintercept = c(-lfc_threshold, lfc_threshold),
+               linetype = "dashed", colour = "grey40") +
+    geom_hline(yintercept = -log10(padj_threshold),
+               linetype = "dashed", colour = "grey40") +
+    theme_bw() +
+    labs(title  = title,
+         x      = "Log2 fold change",
+         y      = "-Log10 adjusted p-value",
+         colour = NULL) +
+    theme(plot.title      = element_text(hjust = 0.5),
+          legend.position = "top")
+}
+
+plot_volcano(res_z1_z2, "Zone 1 vs Zone 2")
+plot_volcano(res_z1_z5, "Zone 1 vs Zone 5")
+plot_volcano(res_z2_z5, "Zone 2 vs Zone 5")
+```
+
+---
+
+# 7. Gene ontology enrichment analysis
+
+```{r}
+# Get significantly upregulated genes in Zone 1 vs Zone 2
+up_z1 <- res_z1_z2 |>
+  filter(!is.na(padj), padj < 0.05, log2FoldChange > 1) |>
+  pull(ensembl_gene_id)
+
+# Run GO enrichment
+ego_z1 <- enrichGO(
+  gene          = up_z1,
+  OrgDb         = org.Mm.eg.db,
+  keyType       = "ENSEMBL",
+  ont           = "BP",           # Biological Process
+  pAdjustMethod = "BH",
+  pvalueCutoff  = 0.05,
+  qvalueCutoff  = 0.05,
+  readable      = TRUE
+)
+
+# Dotplot
+dotplot(ego_z1, showCategory = 20, title = "GO Biological Process — Zone 1 upregulated")
+```
+
+```{r}
+# Barplot
+barplot(ego_z1, showCategory = 15, title = "GO Biological Process — Zone 1 upregulated")
+```
+
+```{r}
+# Export results table
+ego_df <- as.data.frame(ego_z1)
+head(ego_df[, c("Description", "GeneRatio", "pvalue", "p.adjust", "geneID")])
+```
+
+---
+
+# 8. Save results
+
+```{r}
+# Create output directory if it doesn't exist
+dir.create(here("analysis", "solutions"), recursive = TRUE, showWarnings = FALSE)
+
+# Save DESeq2 results tables
+write_csv(res_z1_z2, here("analysis", "solutions", "results_zone1_vs_zone2.csv"))
+write_csv(res_z1_z5, here("analysis", "solutions", "results_zone1_vs_zone5.csv"))
+write_csv(res_z2_z5, here("analysis", "solutions", "results_zone2_vs_zone5.csv"))
+
+# Save DESeq2 object — contains normalised counts, size factors, dispersion
+# estimates and design for all 8 samples across all three zones
+saveRDS(dds_all, here("analysis", "solutions", "dds_all.rds"))
+
+# Save gene annotation — needed for joining gene symbols on Day 5
+saveRDS(gene_info, here("analysis", "solutions", "gene_info.rds"))
+```
+
+---
+
+*By Lisa Korneeva with some help of Claude Sonnet 4.6*
