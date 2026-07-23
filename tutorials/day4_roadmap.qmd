@@ -1,0 +1,220 @@
+---
+title: "Multimodal NGS analysis of gene expression and chromatin state in olfactory epithelium"
+subtitle: "Day 4 - Running the ChIP-seq pipeline"
+author: "Lisa Korneeva"
+date: today
+format:
+  html:
+    self-contained: true
+    toc: true
+    toc-location: left
+    toc-depth: 3
+    theme:
+      - flatly
+      - custom.scss
+    highlight-style: github
+    code-fold: show
+execute:
+  echo: true
+  eval: false
+  warning: false
+  message: false
+engine: knitr
+---
+
+# Overview
+
+Welcome to Day 4! Over the past two days we have processed and explored the RNA-seq data. Today we shift to the epigenomic layer and run the ChIP-seq pipeline.
+
+Yesterday we learned:
+
+- How to load and process raw RNA-seq count data
+- How to run DESeq2 and interpret differential expression results
+- How to visualise results with PCA, MA plots and volcano plots
+
+Today we will:
+
+- Understand what ChIP-seq measures and how it differs from RNA-seq
+- Explore the biological significance of H3K9me3 in the olfactory epithelium
+- Configure and launch the `nf-core/chipseq` pipeline
+- Understand what the pipeline produces and how to interpret the outputs
+
+---
+
+# 1. ChIP-seq — Background
+
+## 1.1 What is ChIP-seq?
+
+**ChIP-seq** (Chromatin immunoprecipitation followed by sequencing) is a method for mapping the genomic locations of proteins - including transcription factors and histone modifications - across the entire genome.
+
+The experimental workflow:
+
+```
+Cells/tissue
+     │
+     ▼
+Cross-link proteins to DNA (formaldehyde)
+     │
+     ▼
+Fragment chromatin (sonication)
+     │
+     ▼
+Immunoprecipitate with antibody (e.g. anti-H3K9me3)
+     │
+     ▼
+Reverse cross-links, purify DNA
+     │
+     ▼
+Sequence the immunoprecipitated DNA fragments
+     │
+     ▼
+Map reads to genome → find enriched regions (peaks)
+```
+
+## 1.2 H3K9me3 
+
+**H3K9me3** (trimethylation of histone H3 at lysine 9) is a histone modification associated with:
+
+- **Constitutive heterochromatin** — silenced genomic regions
+- **Repression of gene expression** — genes marked with H3K9me3 are generally silenced
+- **Silencing of repetitive elements** — transposable elements and satellite repeats
+
+## 1.3 How does ChIP-seq differ from RNA-seq?
+
+| | RNA-seq | ChIP-seq |
+|---|---|---|
+| **What it measures** | Gene expression (RNA) | Protein/histone binding (DNA) |
+| **Input material** | RNA | DNA (chromatin) |
+| **Output** | Read counts per gene | Enriched genomic regions (peaks) |
+| **Key analysis step** | Differential expression | Peak calling |
+| **Biological question** | Which genes are active? | Where is the protein/mark? |
+
+---
+
+# 2. The nf-core/chipseq Pipeline
+
+## 2.1 Pipeline overview
+
+We use [nf-core/chipseq v2.1.0](https://nf-co.re/chipseq/2.1.0) — a community-maintained, best-practice pipeline for ChIP-seq data processing.
+
+> **Exercise:** Browse the [nf-core/chipseq documentation](https://nf-co.re/chipseq/2.1.0) and answer:
+>
+> 1. What aligner does the pipeline use by default?
+> 2. What peak caller does it use?
+
+## 2.2 Resources
+
+| Resource | Link |
+|----------|------|
+| Pipeline documentation | [https://nf-co.re/chipseq/2.1.0](https://nf-co.re/chipseq/2.1.0) |
+| nf-core/chipseq GitHub | [https://github.com/nf-core/chipseq](https://github.com/nf-core/chipseq) |
+
+---
+
+# 3. Setting up the pipeline
+
+## 3.1 Navigate to your ChIP-seq pipeline directory
+
+```{bash}
+cd ~/multimodal-ngs-course-2026/pipelines/chip-seq-zone-specific-nextflow
+ls
+```
+
+## 3.2 The samplesheet
+
+The nf-core/chipseq samplesheet requires the following columns:
+
+| Column | Description |
+|--------|-------------|
+| `sample` | Sample name |
+| `fastq_1` | Path to R1 FASTQ file |
+| `fastq_2` | Path to R2 FASTQ file (leave empty for single-end) |
+| `replicate` | Replicate number |
+| `antibody` | Antibody used (e.g. H3K9me3); leave empty for input control |
+| `control` | Name of the corresponding input control sample |
+| `control_replicate` | Replicate number of the control sample |
+
+## 3.4 Add Nextflow config
+
+Check `nextflow.config`:
+
+```{bash}
+touch nextflow.config
+nano nextflow.config
+```
+
+Add there the following resource settings:
+
+```{groovy}
+process {
+    cpus   = 8
+    memory = '16 GB'
+}
+
+executor {
+    name   = 'local'
+    cpus   = 32
+    memory = '120 GB'
+}
+```
+
+## 3.4 The run script
+
+Create `run.sh`:
+
+```{bash}
+touch run.sh
+chmod +x run.sh
+```
+
+It should look like this:
+
+```{bash}
+export NXF_VER=24.10.6
+
+nextflow run nf-core/chipseq \
+    --input samplesheet.csv \
+    --outdir ./results \
+    --genome GRCm38 \
+    --aligner bowtie2 \
+    --read_length 75 \
+    -profile singularity \
+    -c nextflow.config \
+    -resume
+```
+
+---
+
+# 4. Launching the Pipeline
+
+## 4.1 Open a screen session
+
+```{bash}
+screen -S chipseq
+```
+
+## 4.2 Launch the pipeline
+
+```{bash}
+./run.sh
+```
+
+Detach from screen - the pipeline will keep running:
+```
+Ctrl + A, then D
+```
+---
+
+# Summary of Today
+
+| Step | Tool | Output |
+|------|------|--------|
+| Conceptual introduction | — | Understanding of ChIP-seq and H3K9me3 |
+| Samplesheet setup | CSV file | Correctly formatted input for pipeline |
+| Pipeline launch | Nextflow | Running ChIP-seq analysis |
+
+Tomorrow we will integrate the ChIP-seq and RNA-seq results to understand how H3K9me3 relates to zone-specific olfactory receptor expression.
+
+---
+
+*By Lisa Korneeva with some help of Claude Sonnet 4.6*
